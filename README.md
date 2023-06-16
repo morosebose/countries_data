@@ -1,8 +1,5 @@
 # countries_data
-Final project for CIS 41 B
-James Kang, Surajit Bose
 
-## Description
 This project uses the [REST Countries](https://restcountries.com/) API to create a database of countries. Information for each country includes:
 - Common name, e.g., Suriname
 - Official name, e.g.,  Republic of Suriname
@@ -10,22 +7,20 @@ This project uses the [REST Countries](https://restcountries.com/) API to create
 - Population
 - Currency
 - Continent, etc. 
-The database is linked to a GUI front end that allows the user to choose up to five countries either by continent or worldwide and display the data. For example, the user can choose to display the top five countries by population or by area. The user can also choose specific countries to see all the information about them. 
+
+The database is linked to a GUI front end that allows users to choose what data they want to view. For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them. 
 
 ## Skills
-- API call, JSON 
-- SQLite
-- numpy or pandas
-- matplotlib 
-- Tkinter
-
-## New skills for purpose of lab
-- Many-to-many relationships among database tables, e.g., Turkey and Russia straddle continents
-- Writing out database table to CSV file
-- Box plots for matplotlib, e.g., show the population distribution of all the countries by continent using box plots
+- Web access, API call, JSON 
+- Database CRUD using SQLite
+- Data analytics with numpy or pandas
+- Display data with matplotlib 
+- GUI front end with Tkinter
 
 ## Credits
 - Final project for for CIS 41B (Advanced Python Programming) at De Anza College, Spring 2023
 - Professor: Clare Nguyen
-- Authors: [James Kang](https://github.com/jcmkang), [Surajit A. Bose](https://github.com/morosebose), © 2023
+- Authors, © 2023: 
+  - [James Kang](https://github.com/jcmkang), front end (TKinter, matplotlib) 
+  - [Surajit A. Bose](https://github.com/morosebose), back end (JSON, SQLite, numpy/pandas)
 - REST Countries API provided by [Alejandro Matos](https://gitlab.com/amatos). 
