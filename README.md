@@ -3,7 +3,7 @@ Final project for CIS 41 B
 James Kang, Surajit Bose
 
 ## Description
-This project uses the [REST Countries](https://restcountries.com/) to create a database of countries. Information for each country includes:
+This project uses the [REST Countries](https://restcountries.com/) API to create a database of countries. Information for each country includes:
 - Common name, e.g., Suriname
 - Official name, e.g.,  Republic of Suriname
 - Capital
