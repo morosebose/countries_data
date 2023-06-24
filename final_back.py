@@ -14,6 +14,7 @@ DATABASE = 'countries.db'
 def createTables(cur) :  
     
     # Create Continents table, many countries in a continent
+    # API assigns single continent for each country, even Russia, Turkey, etc
     cur.execute('DROP TABLE IF EXISTS Continents')
     cur.execute('''CREATE TABLE Continents(
         id INTEGER NOT NULL PRIMARY KEY UNIQUE,
@@ -76,11 +77,26 @@ def createTables(cur) :
         country INTEGER,
         currency INTEGER)''')
     
+    # Create Borders table
+    cur.execute('DROP TABLE IF EXISTS Borders')
+    cur.execute('''CREATE TABLE Borders(
+        id INTEGER NOT NULL PRIMARY KEY UNIQUE,
+        country_1 INTEGER,
+        country_2 INTEGER)''')
+    
 
 def populateTables (countries, cur) :
+    
+    # Can't put country into borders table if it isn't in countries table
+    # But the countries bordering a given country might not already be there
+    # Local dictionary to solve this chicken-and-egg problem
+    borders_dict = {}
         
     # Walk through JSON and populate database
     for val in countries :
+        
+        # Prepare to handle special cases before attempting to write tables
+        # Or writing will crash / tables will have wrong data
     
         # API has wrong map for Indonesia, shows Hungary?!
         country = val['name']['common']
@@ -88,9 +104,7 @@ def populateTables (countries, cur) :
             map_url = 'https://goo.gl/maps/w7M4eCTtCuFdSnJx9'
         else : 
             map_url = val['maps']['googleMaps']
-        
-        # Handle KeyErrors for special case values to insert in tables
-        # Better to do here because special cases are tricky              
+                  
         # Kosovo has no key ['independent']
         try : 
             indep = 1 if val['independent'] else 0
@@ -98,7 +112,7 @@ def populateTables (countries, cur) :
             indep = 1      # Most UN Nations recognize Kosovo's independence
      
         # Antarctica, Bouvet Island, Macau, and Heard Island and McDonald 
-        # Island are not real places with capitals, languages, and/or currency
+        # Islands have no capitals, languages, and/or currency
         no_val = ['None']
         
         try :
@@ -116,6 +130,12 @@ def populateTables (countries, cur) :
         except KeyError :
             langs = no_val
             
+        # Island nations have no key ['borders']
+        try :
+            borders_dict[country] = val['borders']
+        except KeyError :
+            borders_dict[country] = no_val
+        
         # Populate Continents table
         cur.execute('INSERT INTO Continents (name) VALUES (?)', \
                     (val['continents'][0],))
@@ -130,8 +150,7 @@ def populateTables (countries, cur) :
                     (country, val['name']['official'], val['cca3'], \
                      indep, val['flag'], cont_id, val['area'], \
                     val['population'], map_url))
-        cur.execute('SELECT id FROM Countries WHERE name = ?', \
-                    (val['name']['common'],))
+        cur.execute('SELECT id FROM Countries WHERE name = ?', (country,))
         country_id = cur.fetchone()[0]
         
         # Populate Capitals table and junction table
@@ -159,7 +178,20 @@ def populateTables (countries, cur) :
             curren_id = cur.fetchone()[0]
             cur.execute('''INSERT INTO Count_Curr_Jn (country, currency) 
                         VALUES (?, ?)''', (country_id, curren_id))
-
+    
+    # Populate Borders table
+    for nation, borders in borders_dict.items() :
+        if borders != no_val :
+            cur.execute('''SELECT id FROM Countries 
+                    WHERE name = ?''', (nation,))
+            cid = cur.fetchone()[0]
+            for border in borders :
+                cur.execute('''SELECT id FROM Countries 
+                            WHERE code = ?''', (border,))
+                bid = cur.fetchone()[0]
+                cur.execute('''INSERT INTO Borders (country_1, country_2)
+                            VALUES (?, ?)''', (cid, bid))
+            
 
 def write_csv(cur):
     with open ('area_pop_data.csv', 'w', newline = '') as datafile :
