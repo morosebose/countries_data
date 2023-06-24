@@ -34,7 +34,7 @@ def createTables(cur) :
         pop INTEGER NOT NULL,
         map TEXT NOT NULL UNIQUE)''')
     
-    # Create Capitals table, one country can have many capitals
+    # Create Capitals table, one country can have many capitals (South Africa)
     # One capital can serve many countries (Jerusalem for Israel and Palestine)
     cur.execute('DROP TABLE IF EXISTS Capitals')
     cur.execute ('''CREATE TABLE Capitals(
@@ -42,13 +42,13 @@ def createTables(cur) :
         name TEXT NOT NULL UNIQUE ON CONFLICT IGNORE)''')
         
     # Create Languages table, many languages in a country
-    # Many countries with one language, e.g., Arabic
+    # Many countries share a language, e.g., Arabic
     cur.execute('DROP TABLE IF EXISTS Languages')
     cur.execute('''CREATE TABLE Languages(
         id INTEGER NOT NULL PRIMARY KEY UNIQUE,
         name TEXT UNIQUE ON CONFLICT IGNORE)''')
     
-    # Create Currencies table, many countries use US Dollar
+    # Create Currencies table, many countries use Euro
     # Some countries officially allow other countries' currencies 
     # alongside their own
     cur.execute('DROP TABLE IF EXISTS Currencies')
@@ -85,7 +85,7 @@ def createTables(cur) :
         country_2 INTEGER)''')
     
 
-def populateTables (countries, cur) :
+def writeTables (countries, cur) :
     
     # Can't put country into borders table if it isn't in countries table
     # But the countries bordering a given country might not already be there
@@ -126,9 +126,9 @@ def populateTables (countries, cur) :
             langs = no_val
             
         try :
-            currens = val['currencies'].values()
+            currens = [key['name'] for key in val['currencies'].values()]
         except KeyError :
-            langs = no_val
+            currens = no_val
             
         # Island nations have no key ['borders']
         try :
@@ -151,35 +151,18 @@ def populateTables (countries, cur) :
                      indep, val['flag'], cont_id, val['area'], \
                     val['population'], map_url))
         cur.execute('SELECT id FROM Countries WHERE name = ?', (country,))
-        country_id = cur.fetchone()[0]
+        cid = cur.fetchone()[0]
         
-        # Populate Capitals table and junction table
-        for capital in caps :
-            cur.execute('INSERT INTO Capitals (name) VALUES (?)', (capital,))
-            cur.execute('SELECT id FROM Capitals WHERE name = ?', (capital,))
-            cap_id = cur.fetchone()[0]
-            cur.execute('''INSERT INTO Count_Cap_Jn (country, capital)
-                        VALUES (?, ?)''', (country_id, cap_id))
-                        
-        # Populate Languages table and junction table             
-        for lang in langs :
-            cur.execute('INSERT INTO Languages (name) VALUES (?)', (lang,))
-            cur.execute('SELECT id FROM Languages WHERE name = ?', (lang,))
-            lang_id = cur.fetchone()[0]
-            cur.execute('''INSERT INTO Count_Lang_Jn (country, language)
-                        VALUES (?, ?)''', (country_id, lang_id))
-        
-        # Populate Currencies table and junction table
-        for curren in currens :
-            cur.execute('INSERT INTO Currencies (name) VALUES (?)', \
-                        (curren['name'],))
-            cur.execute('SELECT id FROM Currencies WHERE name = ?', \
-                        (curren['name'],))
-            curren_id = cur.fetchone()[0]
-            cur.execute('''INSERT INTO Count_Curr_Jn (country, currency) 
-                        VALUES (?, ?)''', (country_id, curren_id))
+        # Populate remaining tables including junction tables
+        writeOthers(cur, cid, caps, 'Capitals', 'Count_Cap_Jn', 'capital')
+        writeOthers(cur, cid, langs, 'Languages', 'Count_Lang_Jn', 'language')
+        writeOthers(cur, cid, currens, 'Currencies', 'Count_Curr_Jn', 'currency')
     
     # Populate Borders table
+    writeBorders(cur, borders_dict, no_val)
+    
+    
+def writeBorders(cur, borders_dict, no_val) :
     for nation, borders in borders_dict.items() :
         if borders != no_val :
             cur.execute('''SELECT id FROM Countries 
@@ -193,7 +176,16 @@ def populateTables (countries, cur) :
                             VALUES (?, ?)''', (cid, bid))
             
 
-def write_csv(cur):
+def writeOthers (cur, country_id, some_list, tab1, tab2, desc) :
+    for item in some_list :
+        cur.execute(f'INSERT INTO {tab1} (name) VALUES (?)', (item,))
+        cur.execute(f'SELECT id FROM {tab1} WHERE name = ?', (item,))
+        current_id = cur.fetchone()[0]
+        cur.execute(f'''INSERT INTO {tab2} (country, {desc})
+                    VALUES (?, ?)''', (country_id, current_id))
+
+
+def writeCSV (cur):
     with open ('area_pop_data.csv', 'w', newline = '') as datafile :
         cur.execute ('SELECT id, continent, area, pop FROM Countries')
         rows = cur.fetchall()
@@ -206,9 +198,9 @@ def main () :
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
     createTables(cur) 
-    populateTables(countries, cur)
+    writeTables(countries, cur)
     conn.commit()
-    write_csv(cur)
+    writeCSV(cur)
     conn.close()
 
 
