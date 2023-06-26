@@ -189,10 +189,10 @@ class MainWindow(tk.Tk):
         choices = self._getChoice(prompt, continents) # <- self._getChoice() returns the choice of continent/whole-world in a tuple
 
         # i dont think i need this.
-        if choices:
-            choice = choices[0]
-        else:
+        if not choices:
             return
+        
+        choice = choices[0]
 
         # # REALLY HAVE TO CLEAN THIS BOTTOM PART UP, BUT IT WORKS FOR NOW.
         # # I'VE UNIT TESTED EVERY RUN, AND IT DOEST WORK.....,
@@ -210,12 +210,16 @@ class MainWindow(tk.Tk):
             prompt = f'Select up to 5 countries: \n\n[Sorted by {filter} (Descending)]'
             print(countries)
             print(len(countries))
-            continent_data = []
-            for country in countries:
-                self._curr.execute(f"""SELECT {filter} FROM Countries
-                                                        WHERE name = ?;""", (country,))
-                data = self._curr.fetchone()[0]
-                continent_data.append(data)
+            # continent_data = []
+            # for country in countries:
+            #     self._curr.execute(f"""SELECT {filter} FROM Countries
+            #                                             WHERE name = ?;""", (country,))
+            #     data = self._curr.fetchone()[0]
+            #     continent_data.append(data)
+
+            # above, but using list comprehension
+            continent_data = [self._curr.execute(f"""SELECT {filter} FROM Countries
+                                                            WHERE name = ?;""", (country,)).fetchone()[0] for country in countries]
             print(continent_data)
             print(type(continent_data))
             continent_data = np.array(continent_data)
@@ -244,12 +248,14 @@ class MainWindow(tk.Tk):
                 countries = list(zip(*self._curr.fetchall()))[0]
                 print(len(countries))
                 prompt = f'Select up to 5 countries: \n\n[Sorted by {filter} (Descending)]'
-                continent_data = []
-                for country in countries:
-                    self._curr.execute(f"""SELECT {filter} FROM Countries
-                                            WHERE name = ?;""", (country, ))
-                    data = self._curr.fetchone()[0]
-                    continent_data.append(data)
+                # continent_data = []
+                # for country in countries:
+                #     self._curr.execute(f"""SELECT {filter} FROM Countries
+                #                             WHERE name = ?;""", (country, ))
+                #     data = self._curr.fetchone()[0]
+                #     continent_data.append(data)
+                continent_data = [self._curr.execute(f"""SELECT {filter} FROM Countries
+                                                                    WHERE name = ?;""", (country,)).fetchone()[0] for country in countries]
                 print(continent_data)
                 print(type(continent_data))
                 continent_data = np.array(continent_data)
