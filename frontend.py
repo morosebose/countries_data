@@ -61,7 +61,7 @@ class PlotWindow(tk.Toplevel):
         # tk.Label(self, textvariable=self.promptStr, font=("Calibri", 13), padx=10,
         #          pady=10).grid()
 
-        fig = plt.figure(figsize=(10,10))
+        fig = plt.figure(figsize=(4,4))
         if bar:
             country = []
             data_val = []
