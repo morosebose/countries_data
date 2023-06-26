@@ -43,13 +43,12 @@ class DisplayWindow(tk.Toplevel):
         tk.Label(F, text="Continent: " + str(continent), font=("Calibri", 13), fg="blue").grid()
         F.grid(pady=20, padx=10)
         tk.Button(self, text="Visit on Google Maps", fg="blue", font=("Calibiri",8), command=lambda: webbrowser.open(url)).grid(padx=5, pady=10)
-        # tk.Label(F, text="Map:" + url, font=("Calibri", 13), fg="blue").grid()
 
 
 class PlotWindow(tk.Toplevel):
 
     ''' class to display boxplot & Bar Chart'''
-    def __init__(self, master, data, bar = None):
+    def __init__(self, master, filter, continent, data, bar = None):
         super().__init__(master)
 
         self.grab_set()
@@ -74,10 +73,11 @@ class PlotWindow(tk.Toplevel):
             print(type(data_val))
             plt.bar(country, data_val)
         else:
-            # demo, gotta ge tour own data in
-            np.random.seed(10)
-            data = np.random.normal(100, 20, 200)
-            plt.boxplot(data)
+            # data is going to be a numpy array of either population or area of the selected continents/world-wide
+            print(type(data))
+            plt.title(f"Box Plot of {filter} for {continent}")
+            #vert=0 goes horizontal
+            plt.boxplot(data, vert=0)
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.get_tk_widget().grid()
@@ -197,8 +197,7 @@ class MainWindow(tk.Tk):
         # # REALLY HAVE TO CLEAN THIS BOTTOM PART UP, BUT IT WORKS FOR NOW.
         # # I'VE UNIT TESTED EVERY RUN, AND IT DOEST WORK.....,
         # # JUST GOTTA CLEAN IT UP AND PUT MAX NUMS FOR COUNTRIES
-
-
+        
         # PROMPT USER: For which countries?
         # if filter is area or pop, display countries in ORDER BY area or pop
         if choice != 0 and (filter == "area" or filter == 'pop'):
@@ -211,8 +210,17 @@ class MainWindow(tk.Tk):
             prompt = f'Select up to 5 countries: \n\n[Sorted by {filter} (Descending)]'
             print(countries)
             print(len(countries))
-            boxPlot = PlotWindow(self, countries )
-
+            continent_data = []
+            for country in countries:
+                self._curr.execute(f"""SELECT {filter} FROM Countries
+                                                        WHERE name = ?;""", (country,))
+                data = self._curr.fetchone()[0]
+                continent_data.append(data)
+            print(continent_data)
+            print(type(continent_data))
+            continent_data = np.array(continent_data)
+            print(type(continent_data))
+            boxPlot = PlotWindow(self, filter, continents[choice], continent_data )
 
         # if filter is general, do not use ORDER BY to display countries, use SORTED by alphabetical order
         elif choice !=0 and filter =='general':
@@ -236,23 +244,29 @@ class MainWindow(tk.Tk):
                 countries = list(zip(*self._curr.fetchall()))[0]
                 print(len(countries))
                 prompt = f'Select up to 5 countries: \n\n[Sorted by {filter} (Descending)]'
-                boxPlot = PlotWindow(self, countries)
+                continent_data = []
+                for country in countries:
+                    self._curr.execute(f"""SELECT {filter} FROM Countries
+                                            WHERE name = ?;""", (country, ))
+                    data = self._curr.fetchone()[0]
+                    continent_data.append(data)
+                print(continent_data)
+                print(type(continent_data))
+                continent_data = np.array(continent_data)
+                print(type(continent_data))
+                boxPlot = PlotWindow(self, filter, continents[choice], continent_data)
             else:
                 print("User chose World-Wide!_!_!_!_!")
                 self._curr.execute(f"""SELECT name FROM Countries""")
                 countries = list(zip(*self._curr.fetchall()))[0]
                 print(len(countries))
                 prompt = f'Select up to 5 countries: \n\n[Sorted by {filter} (Descending)]'
-
-
-
-
+                
         choices = self._getChoice(prompt, countries, multi=True)
         if filter == 'area' or filter == 'pop':
             self._launchCountries(filter, countries, choices)
         else:
             self._launchCard(countries, choices)
-
 
     def _getChoice(self, prompt, continents, multi=None):
         dwin = DialogWindow(self, prompt, continents, multi)
@@ -280,8 +294,7 @@ class MainWindow(tk.Tk):
         print(barData)
         countriesData = dict(zip(barCountries, barData))
         # call plotWindow to create barchart
-        barChart = PlotWindow(self, countriesData, bar=True)
-
+        barChart = PlotWindow(self, filter, choices, countriesData, bar=True)
 
     def _launchCard(self, countries, choices):
         for choice in choices:
@@ -302,8 +315,6 @@ class MainWindow(tk.Tk):
             # WORKS YO! maybe we can add  the flag and use the flag on the card too
 
             DisplayWindow(self, country_name, official, capital, pop, area, lang, currency, continent, url)
-
-
 
     def mainWinClose(self):
         """
