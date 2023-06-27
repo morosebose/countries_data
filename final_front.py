@@ -88,7 +88,7 @@ class DialogWindow(tk.Toplevel):
 
     '''
 
-    def __init__(self, master, prompt, data, mini, maxi, multi=False):
+    def __init__(self, master, prompt, data, mini, maxi, npstr, multi=False):
         '''
 
         '''
@@ -100,19 +100,23 @@ class DialogWindow(tk.Toplevel):
 
         self.promptStr = tk.StringVar()
         self.promptStr.set(prompt)
+        self.numpyStr = tk.StringVar()
         tk.Label(self, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
                  pady=10).grid()
 
         frame = tk.Frame(self)
         self._sb = tk.Scrollbar(frame, orient='vertical')
         if multi:
+            self.numpyStr.set(npstr)
+            tk.Label(frame, textvariable=self.numpyStr, font=('Calibri', 12), padx=10,
+                     pady=3).grid(row=0)
             self._lb = tk.Listbox(frame, height=6, selectmode='multiple', yscrollcommand=self._sb.set)
         else:
             self._lb = tk.Listbox(frame, height=6, yscrollcommand=self._sb.set)
         self._sb.config(command=self._lb.yview)
-        self._lb.grid(row=0, column=0)
-        self._sb.grid(row=0, column=1, sticky='NS')
-        frame.grid(row=1, column=0, padx=10, pady=10)
+        self._lb.grid(row=1, column=0)
+        self._sb.grid(row=1, column=1, sticky='NS')
+        frame.grid(row=2, column=0, padx=10, pady=10)
         self._lb.insert(tk.END, *data)
         tk.Button(self, text='Click to select', command = lambda : self._setChoice(mini, maxi)).grid(padx=5, pady=10)
 
@@ -192,7 +196,8 @@ class MainWindow(tk.Tk):
         continents = list(zip(wholeworld, *self._curr.fetchall()))[0]
         
         prompt = 'What part of the world would you like to tour?'
-        region = self._getChoice(prompt, continents)[0] 
+        labelVar = ''
+        region = self._getChoice(prompt, continents, labelVar)[0]
 
         if region == -1 :   # User closed window without choosing
             return        
@@ -227,7 +232,11 @@ class MainWindow(tk.Tk):
         cont_array = np.array(cont_data)
        #PlotWindow (self, desired, locale, cont_array)
         prompt = f'Select between {mini} and {maxi} out of {len(cont_array)} countries {locale_str} (sorted by {desired_str})'
-        choices = self._getChoice(prompt, data, mini, maxi, multi = True)
+        if desired == "area":
+            labelVar = f'Total Countries: {len(cont_array)}    Total {desired.title()} : {np.sum(cont_array): ,} km\u00B2 '
+        else:
+            labelVar = f'Total Countries: {len(cont_array)}    Total {desired.title()} : {np.sum(cont_array): ,} '
+        choices = self._getChoice(prompt, data, labelVar, mini, maxi, multi=True)
         if choices[0] == -1 :  # user closed without choosing
             return
         self._launchCountries(desired, data, choices)
@@ -235,7 +244,8 @@ class MainWindow(tk.Tk):
     
     def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
         prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
-        choices = self._getChoice(prompt, data, mini, maxi, multi = True)
+        labelVar = ''
+        choices = self._getChoice(prompt, data, labelVar, mini, maxi, multi=True)
         if choices[0] == -1 : # user closed without choosing
             return
         self._launchCard(data, choices)
@@ -260,8 +270,8 @@ class MainWindow(tk.Tk):
                 WHERE Continents.name = ? ORDER BY Countries.{desired} DESC'''
 
 
-    def _getChoice(self, prompt, continents, mini = 1, maxi = 1, multi = None):
-        dwin = DialogWindow(self, prompt, continents, mini, maxi, multi)
+    def _getChoice(self, prompt, continents, labelVar, mini=1, maxi=1, multi=None):
+        dwin = DialogWindow(self, prompt, continents, mini, maxi, labelVar, multi)
         self.wait_window(dwin)
         choice = dwin.chosen
         return choice
