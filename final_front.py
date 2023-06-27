@@ -67,7 +67,10 @@ class PlotWindow(tk.Toplevel):
 
             plt.tight_layout()
             plt.title(f'{desired} of Selected Countries')
-            plt.xlabel(f'{desired}', fontsize = 12)
+            if desired == "Area":
+                plt.xlabel(f'{desired} (km\u00B2)', fontsize = 12)
+            else:
+                plt.xlabel(f'{desired}', fontsize=12)
             plt.ylabel('Countries', fontsize = 12)
             plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.barh(country, data_val)
