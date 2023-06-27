@@ -12,7 +12,7 @@ DATABASE = 'countries.db'
 
 
 def createTables(cur) :  
-    
+    '''Download data from API and create database tables'''
     # Create Continents table, many countries in a continent
     # API assigns single continent for each country, even Russia, Turkey, etc
     cur.execute('DROP TABLE IF EXISTS Continents')
@@ -86,7 +86,7 @@ def createTables(cur) :
     
 
 def writeTables (countries, cur) :
-    
+    '''Write data from database into tables'''
     # Can't put country into borders table if it isn't in countries table
     # But the countries bordering a given country might not already be there
     # Local dictionary to solve this chicken-and-egg problem
@@ -163,6 +163,7 @@ def writeTables (countries, cur) :
     
     
 def writeBorders(cur, borders_dict, no_val) :
+    '''Write Borders table'''
     for nation, borders in borders_dict.items() :
         if borders != no_val :
             cur.execute('''SELECT id FROM Countries 
@@ -177,6 +178,7 @@ def writeBorders(cur, borders_dict, no_val) :
             
 
 def writeOthers (cur, country_id, some_list, tab1, tab2, desc) :
+    '''Helper function to write many-to-many tables'''
     for item in some_list :
         cur.execute(f'INSERT INTO {tab1} (name) VALUES (?)', (item,))
         cur.execute(f'SELECT id FROM {tab1} WHERE name = ?', (item,))
@@ -186,6 +188,7 @@ def writeOthers (cur, country_id, some_list, tab1, tab2, desc) :
 
 
 def writeCSV (cur):
+    '''Write out CSV of data for numpy use (we ended up not using this)'''
     with open ('area_pop_data.csv', 'w', newline = '') as datafile :
         cur.execute ('SELECT id, continent, area, pop FROM Countries')
         rows = cur.fetchall()
@@ -194,6 +197,7 @@ def writeCSV (cur):
         
 
 def main () :
+    '''Code driver'''
     countries = requests.get(API_URL).json()
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
