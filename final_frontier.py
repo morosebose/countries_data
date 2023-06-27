@@ -48,8 +48,7 @@ class PlotWindow(tk.Toplevel):
     def __init__(self, master, desired, continent, data, bar = False):
         super().__init__(master)
 
-        self.grab_set()
-        self.focus_set()
+        
         self.transient(master)
 
         
