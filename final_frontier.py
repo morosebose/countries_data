@@ -70,9 +70,8 @@ class PlotWindow(tk.Toplevel):
             plt.xlabel(f'{desired}', fontsize = 10)
             plt.ylabel('Countries', fontsize = 10)
             plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            plt.tight_layout()
             plt.barh(country, data_val)
-            
+            fig.tight_layout()
             canvas = FigureCanvasTkAgg(fig, master=self)
             canvas.get_tk_widget().grid()
             canvas.draw()
@@ -83,8 +82,8 @@ class PlotWindow(tk.Toplevel):
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.yticks = (np.min(data_val), np.quantile(data_val, 0.25), \
                 np.median(data_val), np.quantile(data_val, 0.75), np.max(data_val))
-            plt.tight_layout()
             plt.boxplot(data_val)
+            plt.tight_layout()
                 
     
             canvas = FigureCanvasTkAgg(fig, master=self)
@@ -234,6 +233,7 @@ class MainWindow(tk.Tk):
             self._handleGeneral(data, locale, locale_str, desired, desired_str, mini, maxi)
             
     def _handleAreaOrPop(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
+        '''Get list of countries with population or area data'''
         cont_data = [self._curr.execute(f'''SELECT {desired} from Countries 
                 WHERE name = ?''', (country,)).fetchone()[0] for country in data]
         cont_array = np.array(cont_data)
@@ -249,6 +249,7 @@ class MainWindow(tk.Tk):
         
     
     def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
+        '''Get list of countries with general info'''
         prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
         labelVar = ''
         choices = self._getChoice(prompt, data, labelVar, mini, maxi, multi = True)
@@ -258,6 +259,7 @@ class MainWindow(tk.Tk):
         
 
     def _getCommand (self, desired, region) :
+        '''Get approppriate SQL command to run on database depending on user choice'''
         if desired == 'general' :
             if not region :
                 # User wants general info worldwide
@@ -277,6 +279,7 @@ class MainWindow(tk.Tk):
 
 
     def _getChoice(self, prompt, continents, labelVar = '', mini = 1, maxi = 1, multi = False):
+        '''Get user's choice of which continent or countries to see'''
         dwin = DialogWindow(self, prompt, continents, mini, maxi, labelVar, multi)
         self.wait_window(dwin)
         choice = dwin.chosen
@@ -284,6 +287,7 @@ class MainWindow(tk.Tk):
 
 
     def _launchCountries(self, desired, countries, choices):
+        '''Display chosen countries by area or population'''
         # store countries and data in list to be used for bar chart
         barCountries = []
         barData = []
@@ -302,6 +306,7 @@ class MainWindow(tk.Tk):
 
 
     def _launchCard(self, countries, choices):
+        '''Display general info for individual countries'''
         for choice in choices:
             name = countries[choice]
             self._curr.execute('''SELECT C.name, C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
