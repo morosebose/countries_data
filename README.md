@@ -17,6 +17,12 @@ The database is linked to a GUI front end that allows users to choose what data 
 - Display data with matplotlib 
 - GUI front end with Tkinter
 
+## Files
+- final_back.py has the API call and the code to create the database from the resulting JSON download. This file creates two additional files:
+  - area_pop_data.csv a CSV of the numeric (integer) data from the database
+  - countries.db a sqlite database of the countries data from the API
+- final_frontier.py has the GUI front end to navigate and display the data using TKinter and numpy
+
 ## Credits
 - Final project for for CIS 41B (Advanced Python Programming) at De Anza College, Spring 2023
 - Professor: Clare Nguyen
