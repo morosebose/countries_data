@@ -108,8 +108,8 @@ class DialogWindow(tk.Toplevel):
         self._sb = tk.Scrollbar(frame, orient='vertical')
         if multi:
             self.numpyStr.set(npstr)
-            tk.Label(frame, textvariable=self.numpyStr, font=('Calibri', 12), padx=10,
-                     pady=3).grid(row=0)
+            tk.Label(self, textvariable=self.numpyStr, font=('Calibri', 12), padx=10,
+                     pady=3).grid()
             self._lb = tk.Listbox(frame, height=6, selectmode='multiple', yscrollcommand=self._sb.set)
         else:
             self._lb = tk.Listbox(frame, height=6, yscrollcommand=self._sb.set)
