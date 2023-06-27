@@ -19,7 +19,7 @@ import numpy as np
 
 class DisplayWindow(tk.Toplevel):
     ''' class to display individual cards -> gets called for every country selected'''
-    def __init__(self, master, name, official, capital, pop, area, lang, currency, continent, url) :
+    def __init__(self, master, name, flag, official, capital, pop, area, lang, currency, continent, url) :
         super().__init__(master)
         
         # i dont think we want these. i just copied and pasted from DialogWin
@@ -27,22 +27,21 @@ class DisplayWindow(tk.Toplevel):
         # self.focus_set()
         self.transient(master)
         self.promptStr = tk.StringVar()
-        self.promptStr.set(f"General Information {name}")
+        self.promptStr.set(f"General Information of {name}")
 
-        # make frame & labels for country card
+        # make frame,labels & button for country card
         F = tk.Frame(self)
-        tk.Label(F, textvariable=self.promptStr, font=("Calibri", 13), padx=10,
-                 pady=10).grid()
-        tk.Label(F, text=name, font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text=official, font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Capital: " + str(capital), font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Population: " + str(pop), font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Area: " + str(area), font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Language: " + str(lang), font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Currency: " + str(currency), font=("Calibri", 13), fg="blue").grid()
-        tk.Label(F, text="Continent: " + str(continent), font=("Calibri", 13), fg="blue").grid()
+        tk.Label(F, textvariable=self.promptStr, font=("Calibri", 13), padx=10, pady=10).grid(columnspan=2)
+        tk.Label(F, text=flag, font=("Calibri", 14), fg="blue").grid(row=1, column=0, sticky='e')
+        tk.Label(F, text=official, font=("Calibri", 14), fg="blue").grid(row=1, column=1, sticky='w')
+        tk.Label(F, text="Capital: " + str(capital), font=("Calibri", 13), fg="blue").grid(row=2, columnspan=2)
+        tk.Label(F, text=f"Population: {pop: ,}", font=("Calibri", 13), fg="blue").grid(row=3, columnspan=2)
+        tk.Label(F, text=f"Area: {area: ,} km\u00B2", font=("Calibri", 13), fg="blue").grid(row=4, columnspan=2)
+        tk.Label(F, text="Language: " + str(lang).title(), font=("Calibri", 13), fg="blue").grid(row=5, columnspan=2)
+        tk.Label(F, text="Currency: " + str(currency).title(), font=("Calibri", 13), fg="blue").grid(row=6, columnspan=2)
+        tk.Label(F, text="Continent: " + str(continent), font=("Calibri", 13), fg="blue").grid(row=7, columnspan=2)
         F.grid(pady=20, padx=10)
-        tk.Button(self, text="Visit on Google Maps", fg="blue", font=("Calibiri",8), command=lambda: webbrowser.open(url)).grid(padx=5, pady=10)
+        tk.Button(self, text="Visit on Google Maps", fg="blue", font=("Calibiri",10), command=lambda: webbrowser.open(url)).grid(padx=5, pady=10)
 
 
 class PlotWindow(tk.Toplevel):
@@ -306,8 +305,8 @@ class MainWindow(tk.Tk):
         for choice in choices:
             name = countries[choice]
             # joins all tables, Countries, Continents, Languages, Capitals, Currencies with their C_C_JN <- i get it but idk how to write it?
-            # like i'm using the _JN tables to do the many to many joining .. brain dead. 
-            self._curr.execute("""SELECT C.name, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
+            # like i'm using the _JN tables to do the many to many joining .. brain dead.
+            self._curr.execute("""SELECT C.name, C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
                                     FROM Countries C, Continents CO
                                     INNER JOIN Count_Lang_Jn CL on C.id = CL.country
                                     INNER JOIN Languages L on CL.language = L.id
@@ -316,11 +315,11 @@ class MainWindow(tk.Tk):
                                     INNER JOIN Count_Curr_Jn CR on C.id = CR.country
                                     INNER JOIN Currencies CUR on CR.currency = CUR.id
                                     WHERE C.continent = CO.id AND C.name = ?;""", (name, ))
-            country_name, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
-            print(country_name, official, capital, pop, area, lang, currency, continent, url)
+            name, flag, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
+            print(name, flag, official, capital, pop, area, lang, currency, continent, url)
             # WORKS YO! maybe we can add  the flag and use the flag on the card too
 
-            DisplayWindow(self, country_name, official, capital, pop, area, lang, currency, continent, url)
+            DisplayWindow(self, name, flag, official, capital, pop, area, lang, currency, continent, url)
 
     def mainWinClose(self):
         """
