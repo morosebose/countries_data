@@ -20,27 +20,26 @@ import numpy as np
 
 class DisplayWindow(tk.Toplevel):
     ''' class to display individual cards -> gets called for every country selected'''
-    def __init__(self, master, name, official, capital, pop, area, lang, currency, continent, url) :
+    def __init__(self, master, name, flag, official, capital, pop, area, lang, currency, continent, url) :
         super().__init__(master)
         
         self.transient(master)
         self.promptStr = tk.StringVar()
-        self.promptStr.set(f'General Information {name}')
+        self.promptStr.set(f'General Information for {name}')
 
-        # make frame & labels for country card
+        # make frame, labels, and button for country card
         F = tk.Frame(self)
-        tk.Label(F, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
-                 pady=10).grid()
-        tk.Label(F, text=name, font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text=official, font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Capital: ' + str(capital), font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Population: ' + str(pop), font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Area: ' + str(area), font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Language: ' + str(lang), font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Currency: ' + str(currency), font=('Calibri', 13), fg='blue').grid()
-        tk.Label(F, text='Continent: ' + str(continent), font=('Calibri', 13), fg='blue').grid()
+        tk.Label(F, textvariable=self.promptStr, font=("Calibri", 13), padx=10, pady=10).grid(columnspan=2)
+        tk.Label(F, text=flag, font=("Calibri", 14), fg="blue").grid(row=1, column=0, sticky='e')
+        tk.Label(F, text=official, font=("Calibri", 14), fg="blue").grid(row=1, column=1, sticky='w')
+        tk.Label(F, text="Capital: " + str(capital), font=("Calibri", 13), fg="blue").grid(row=2, columnspan=2)
+        tk.Label(F, text=f"Population: {pop: ,}", font=("Calibri", 13), fg="blue").grid(row=3, columnspan=2)
+        tk.Label(F, text=f"Area: {area: ,} km\u00B2", font=("Calibri", 13), fg="blue").grid(row=4, columnspan=2)
+        tk.Label(F, text="Language: " + str(lang).title(), font=("Calibri", 13), fg="blue").grid(row=5, columnspan=2)
+        tk.Label(F, text="Currency: " + str(currency).title(), font=("Calibri", 13), fg="blue").grid(row=6, columnspan=2)
+        tk.Label(F, text="Continent: " + str(continent), font=("Calibri", 13), fg="blue").grid(row=7, columnspan=2)
         F.grid(pady=20, padx=10)
-        tk.Button(self, text='Visit on Google Maps', fg='blue', font=('Calibiri',8), command=lambda: webbrowser.open(url)).grid(padx=5, pady=10)
+        tk.Button(self, text='Visit on Google Maps', fg='blue', font=('Calibiri', 10), command = lambda: webbrowser.open(url)).grid(padx=5, pady=10)
 
 
 class PlotWindow(tk.Toplevel):
@@ -53,11 +52,6 @@ class PlotWindow(tk.Toplevel):
         self.focus_set()
         self.transient(master)
 
-        # Need to put title still
-        # self.promptStr = tk.StringVar()
-        # self.promptStr.set(f'MAKE BOXPLOT OF THESE COUNTRIES: {data}')
-        # tk.Label(self, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
-        #          pady=10).grid()
         
         if desired == 'pop' :
             desired = 'Population'
@@ -126,6 +120,7 @@ class DialogWindow(tk.Toplevel):
 
     def _setChoice(self, mini, maxi):
         choice = self._lb.curselection()
+        print(f'num choices: {len(choice)}, minimum: {mini}, maximum: {maxi}')
         if not mini <= len(choice) <= maxi :
             tkmb.showerror('Error', f'Please choose between {mini} and {maxi} countries', parent = self)
             self._lb.selection_clear(0, tk.END)
@@ -208,6 +203,7 @@ class MainWindow(tk.Tk):
             locale_str = f'in {locale}'
             self._curr.execute(cmd, (locale,))
         else :
+            locale = ''
             locale_str = wholeworld[0]
             self._curr.execute(cmd)
             
@@ -230,17 +226,18 @@ class MainWindow(tk.Tk):
                 WHERE name = ?''', (country,)).fetchone()[0] for country in data]
         cont_array = np.array(cont_data)
        #PlotWindow (self, desired, locale, cont_array)
-        prompt = f'''Select between {mini} and {maxi}
-            out of {len(cont_array)} countries {locale_str}
-            (sorted by {desired_str})'''
+        prompt = f'Select between {mini} and {maxi} out of {len(cont_array)} countries {locale_str} (sorted by {desired_str})'
         choices = self._getChoice(prompt, data, mini, maxi, multi = True)
+        if choices[0] == -1 :  # user closed without choosing
+            return
         self._launchCountries(desired, data, choices)
         
     
     def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
-        prompt = f'''Select between {mini} and {maxi}
-            countries {locale_str} (sorted alphabetically)'''
+        prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
         choices = self._getChoice(prompt, data, mini, maxi, multi = True)
+        if choices[0] == -1 : # user closed without choosing
+            return
         self._launchCard(data, choices)
         
 
@@ -289,7 +286,7 @@ class MainWindow(tk.Tk):
     def _launchCard(self, countries, choices):
         for choice in choices:
             name = countries[choice]
-            self._curr.execute('''SELECT C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
+            self._curr.execute('''SELECT C.name, C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
                                     FROM Countries C, Continents CO
                                     INNER JOIN Count_Lang_Jn CL on C.id = CL.country
                                     INNER JOIN Languages L on CL.language = L.id
@@ -298,10 +295,10 @@ class MainWindow(tk.Tk):
                                     INNER JOIN Count_Curr_Jn CR on C.id = CR.country
                                     INNER JOIN Currencies CUR on CR.currency = CUR.id
                                     WHERE C.continent = CO.id AND C.name = ?;''', (name, ))
-            country_flag, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
+            name, flag, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
 
 
-            DisplayWindow(self, country_flag, official, capital, pop, area, lang, currency, continent, url)
+            DisplayWindow(self, name, flag, official, capital, pop, area, lang, currency, continent, url)
 
     def mainWinClose(self):
         '''
