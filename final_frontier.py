@@ -94,7 +94,7 @@ class PlotWindow(tk.Toplevel):
 
 class DialogWindow(tk.Toplevel):
     '''
-
+    class to interact with the user and display a listbox for user to get selection of countries
     '''
 
     def __init__(self, master, prompt, data, mini, maxi, npstr, multi=False):
