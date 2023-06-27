@@ -77,6 +77,11 @@ class PlotWindow(tk.Toplevel):
         else: 
             fig = plt.figure(figsize=(8,4))
             plt.title(f'Box Plot of {desired} for Selected Countries')
+            plt.xlabel('Selected Countries', fontsize = 10)
+            if desired == "Area":
+                plt.ylabel(f'{desired} (km\u00B2)', fontsize = 10)
+            else:
+                plt.ylabel(f'{desired}', fontsize=10)
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.yticks = (np.min(data_val), np.quantile(data_val, 0.25), \
                 np.median(data_val), np.quantile(data_val, 0.75), np.max(data_val))
