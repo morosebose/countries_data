@@ -47,10 +47,6 @@ class PlotWindow(tk.Toplevel):
     ''' class to display boxplot & Bar Chart'''
     def __init__(self, master, desired, continent, data, bar = False):
         super().__init__(master)
-
-        
-        self.transient(master)
-
         
         if desired == 'pop' :
             desired = 'Population'
