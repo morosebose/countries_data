@@ -13,6 +13,7 @@ from os.path import exists
 import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.ticker import StrMethodFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -22,9 +23,6 @@ class DisplayWindow(tk.Toplevel):
     def __init__(self, master, name, official, capital, pop, area, lang, currency, continent, url) :
         super().__init__(master)
         
-        # i dont think we want these. i just copied and pasted from DialogWin
-        # self.grab_set()
-        # self.focus_set()
         self.transient(master)
         self.promptStr = tk.StringVar()
         self.promptStr.set(f'General Information {name}')
@@ -60,23 +58,30 @@ class PlotWindow(tk.Toplevel):
         # self.promptStr.set(f'MAKE BOXPLOT OF THESE COUNTRIES: {data}')
         # tk.Label(self, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
         #          pady=10).grid()
-
-        fig = plt.figure(figsize=(4,4))
+        
+        if desired == 'pop' :
+            desired = 'Population'
+        else :
+            desired = desired.title()
+        
         if bar:
+            fig = plt.figure(figsize = (10, 5))
             country = []
             data_val = []
             for item in data.items():
                 country.append(item[0]), data_val.append(item[1])
-            print(country)
-            print(type(country))
-            print(data_val)
-            print(type(data_val))
-            plt.bar(country, data_val)
+
+            plt.tight_layout()
+            plt.title(f'{desired} of Selected Countries')
+            plt.xlabel(f'{desired}', fontsize = 12)
+            plt.ylabel('Countries', fontsize = 12)
+            plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
+            plt.barh(country, data_val)
+            
         else:
             # data is going to be a numpy array of either population or area of the selected continents/world-wide
-            print(type(data))
+            fig = plt.figure(figsize=(4,4))
             plt.title(f'Box Plot of {desired} for {continent}')
-            #vert=0 goes horizontal
             plt.boxplot(data, vert=0)
 
         canvas = FigureCanvasTkAgg(fig, master=self)
@@ -89,7 +94,7 @@ class DialogWindow(tk.Toplevel):
 
     '''
 
-    def __init__(self, master, prompt, data, multi=False):
+    def __init__(self, master, prompt, data, mini, maxi, multi=False):
         '''
 
         '''
@@ -97,8 +102,8 @@ class DialogWindow(tk.Toplevel):
         self.grab_set()
         self.focus_set()
         self.transient(master)
-        self._choice = -1
-        # variable to store the prompt for user to select all/continents or to select countries (up to 5)
+        self._choice = (-1, )
+
         self.promptStr = tk.StringVar()
         self.promptStr.set(prompt)
         tk.Label(self, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
@@ -115,25 +120,26 @@ class DialogWindow(tk.Toplevel):
         self._sb.grid(row=0, column=1, sticky='NS')
         frame.grid(row=1, column=0, padx=10, pady=10)
         self._lb.insert(tk.END, *data)
-        tk.Button(self, text='Click to select', command=self._setChoice).grid(padx=5, pady=10)
+        tk.Button(self, text='Click to select', command = lambda : self._setChoice(mini, maxi)).grid(padx=5, pady=10)
 
         self.protocol('WM_DELETE_WIDOW', self._close)
 
-    def _setChoice(self):
-        self._choice = self._lb.curselection()
-        print(self._choice)
-        self.destroy()
+    def _setChoice(self, mini, maxi):
+        choice = self._lb.curselection()
+        if not mini <= len(choice) <= maxi :
+            tkmb.showerror('Error', f'Please choose between {mini} and {maxi} countries', parent = self)
+            self._lb.selection_clear(0, tk.END)
+            choice = self._lb.curselection()
+        else :
+            self._choice = choice
+            self.destroy()
 
-    def getChoice(self):
+
+    @property
+    def chosen(self):
         return self._choice
-        # return self._choice
-
-    # @property
-    # def chosen(self):
-    #     return self.choice
 
     def _close(self):
-        self._choice = []
         self.destroy()
 
 
@@ -147,7 +153,7 @@ class MainWindow(tk.Tk):
     # Class attributes
     COUNTRIES_DB = 'countries.db' # database from which window displays data
     MIN_COUNTRIES = 5 # minimum number of countries to display
-    MAX_COUNTRIES = 15 # maximum number of countries to display
+    MAX_COUNTRIES = 12 # maximum number of countries to display
 
     def __init__(self):
         '''
@@ -185,10 +191,11 @@ class MainWindow(tk.Tk):
         Generate sorted list of appropriate countries based on user choice
         Pass list on to method to get user's choice of countries
         '''
+        
         self._curr.execute('SELECT name FROM Continents ORDER BY name')
         wholeworld = ['Worldwide']
         continents = list(zip(wholeworld, *self._curr.fetchall()))[0]
-        # pass in variable prompt, to prompt user to choose the part of the world first..
+        
         prompt = 'What part of the world would you like to tour?'
         region = self._getChoice(prompt, continents)[0] 
 
@@ -196,34 +203,44 @@ class MainWindow(tk.Tk):
             return        
          
         cmd = self._getCommand(desired, region)   
-        print(cmd)
         if region : 
             locale = continents[region]
+            locale_str = f'in {locale}'
             self._curr.execute(cmd, (locale,))
         else :
+            locale_str = wholeworld[0]
             self._curr.execute(cmd)
             
         data = list(zip(*self._curr.fetchall()))[0]
         
+        desired_str = desired if desired == 'area' else 'population'
+        mini = MainWindow.MIN_COUNTRIES
+        maxi = MainWindow.MAX_COUNTRIES
+        
         if desired != 'general' :
-            self._handleAreaOrPop(data, locale, desired)
+            self._handleAreaOrPop(data, locale, locale_str, desired, desired_str, mini, maxi)
         else :
-            self._handleGeneral(data)
+            self._handleGeneral(data, locale, locale_str, desired, desired_str, mini, maxi)
             
         
-    def _handleAreaOrPop(self, data, locale, desired) :
+            
+        
+    def _handleAreaOrPop(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
         cont_data = [self._curr.execute(f'''SELECT {desired} from Countries 
                 WHERE name = ?''', (country,)).fetchone()[0] for country in data]
         cont_array = np.array(cont_data)
-        PlotWindow (self, desired, locale, cont_array)
-        prompt = f'Select between {MainWindow.MIN_COUNTRIES} and {MainWindow.MAX_COUNTRIES}'
-        choices = self._getChoice(prompt, data, multi = True)
+       #PlotWindow (self, desired, locale, cont_array)
+        prompt = f'''Select between {mini} and {maxi}
+            out of {len(cont_array)} countries {locale_str}
+            (sorted by {desired_str})'''
+        choices = self._getChoice(prompt, data, mini, maxi, multi = True)
         self._launchCountries(desired, data, choices)
         
     
-    def _handleGeneral(self, data) :
-        prompt = f'Select up to {MainWindow.MIN_COUNTRIES}'
-        choices = self._getChoice(prompt, data, multi = True)
+    def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
+        prompt = f'''Select between {mini} and {maxi}
+            countries {locale_str} (sorted alphabetically)'''
+        choices = self._getChoice(prompt, data, mini, maxi, multi = True)
         self._launchCard(data, choices)
         
 
@@ -246,10 +263,10 @@ class MainWindow(tk.Tk):
                 WHERE Continents.name = ? ORDER BY Countries.{desired} DESC'''
 
 
-    def _getChoice(self, prompt, continents, multi = None):
-        dwin = DialogWindow(self, prompt, continents, multi)
+    def _getChoice(self, prompt, continents, mini = 1, maxi = 1, multi = None):
+        dwin = DialogWindow(self, prompt, continents, mini, maxi, multi)
         self.wait_window(dwin)
-        choice = dwin.getChoice()
+        choice = dwin.chosen
         return choice
 
 
@@ -272,8 +289,6 @@ class MainWindow(tk.Tk):
     def _launchCard(self, countries, choices):
         for choice in choices:
             name = countries[choice]
-            # joins all tables, Countries, Continents, Languages, Capitals, Currencies with their C_C_JN <- i get it but idk how to write it?
-            # like i'm using the _JN tables to do the many to many joining .. brain dead. 
             self._curr.execute('''SELECT C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
                                     FROM Countries C, Continents CO
                                     INNER JOIN Count_Lang_Jn CL on C.id = CL.country
@@ -284,7 +299,7 @@ class MainWindow(tk.Tk):
                                     INNER JOIN Currencies CUR on CR.currency = CUR.id
                                     WHERE C.continent = CO.id AND C.name = ?;''', (name, ))
             country_flag, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
-            # WORKS YO! maybe we can add  the flag and use the flag on the card too
+
 
             DisplayWindow(self, country_flag, official, capital, pop, area, lang, currency, continent, url)
 
