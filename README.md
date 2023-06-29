@@ -18,6 +18,9 @@ The database is linked to a GUI front end that allows users to choose what data 
 - GUI front end with Tkinter
 
 ## Files
+
+To run the program, download and install final_back.py and final_front.py into the same folder/directory on your local machine. Then run first final_back.py, then final_front.py from the command line.
+
 - final_back.py has the API call and the code to create the database from the resulting JSON download. This file creates two additional files:
   - area_pop_data.csv a CSV of the numeric (integer) data from the database
   - countries.db a sqlite database of the countries data from the API
