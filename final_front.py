@@ -26,20 +26,31 @@ class DisplayWindow(tk.Toplevel):
         self.transient(master)
         self.promptStr = tk.StringVar()
         self.promptStr.set(f'General Information for {name}')
+        
+        cap_label = 'Capital'
+        if ', ' in capitals:
+            cap_label += 's'
+        lang_label = 'Language'
+        if ', ' in langs :
+            lang_label += 's'
+        if ', ' in currency :
+            currens_label = 'Currencies'
+        else :
+            currens_label = 'Currency'
 
         # make frame, labels, and button for country card
         F = tk.Frame(self)
-        tk.Label(F, textvariable=self.promptStr, font=("Calibri", 13), padx=10, pady=10).grid(columnspan=2)
-        tk.Label(F, text=flag, font=("Calibri", 14), fg="blue").grid(row=1, column=0, sticky='e')
-        tk.Label(F, text=official, font=("Calibri", 14), fg="blue").grid(row=1, column=1, sticky='w')
-        tk.Label(F, text="Capital(s): " + capitals, font=("Calibri", 13), fg="blue").grid(row=2, columnspan=2)
-        tk.Label(F, text=f"Population: {pop: ,}", font=("Calibri", 13), fg="blue").grid(row=3, columnspan=2)
-        tk.Label(F, text=f"Area: {area: ,} km\u00B2", font=("Calibri", 13), fg="blue").grid(row=4, columnspan=2)
-        tk.Label(F, text="Language(s): " + langs, font=("Calibri", 13), fg="blue").grid(row=5, columnspan=2)
-        tk.Label(F, text="Currency/ies: " + currency.title(), font=("Calibri", 13), fg="blue").grid(row=6, columnspan=2)
-        tk.Label(F, text="Continent: " + continent, font=("Calibri", 13), fg="blue").grid(row=7, columnspan=2)
-        F.grid(pady=20, padx=10)
-        tk.Button(self, text='Visit on Google Maps', fg='blue', font=('Calibiri', 10), command = lambda: webbrowser.open(url)).grid(padx=5, pady=10)
+        tk.Label(F, textvariable = self.promptStr, font = ("Calibri", 13), padx = 10, pady = 10).grid(columnspan = 2)
+        tk.Label(F, text = flag, font = ("Calibri", 14), fg = "blue").grid(row = 1, column = 0, sticky = 'e')
+        tk.Label(F, text = official, font = ("Calibri", 14), fg = "blue").grid(row = 1, column = 1, sticky = 'w')
+        tk.Label(F, text = f"{cap_label}: " + capitals, font = ("Calibri", 13), fg = "blue").grid(row = 2, columnspan = 2)
+        tk.Label(F, text = f"Population: {pop: ,}", font = ("Calibri", 13), fg = "blue").grid(row = 3, columnspan = 2)
+        tk.Label(F, text = f"Area: {area: ,} km\u00B2", font = ("Calibri", 13), fg = "blue").grid(row = 4, columnspan = 2)
+        tk.Label(F, text = f"{lang_label}: " + langs, font = ("Calibri", 13), fg = "blue").grid(row = 5, columnspan = 2)
+        tk.Label(F, text = f"{currens_label}: " + currency.title(), font = ("Calibri", 13), fg = "blue").grid(row = 6, columnspan = 2)
+        tk.Label(F, text = "Continent: " + continent, font = ("Calibri", 13), fg = "blue").grid(row = 7, columnspan = 2)
+        F.grid(pady = 20, padx = 10)
+        tk.Button(self, text = 'Visit on Google Maps', fg = 'blue', font = ('Calibiri', 10), command = lambda: webbrowser.open(url)).grid(padx = 5, pady = 10)
 
 
 class PlotWindow(tk.Toplevel):
@@ -64,23 +75,23 @@ class PlotWindow(tk.Toplevel):
             if desired == "Area":
                 plt.xlabel(f'{desired} (km\u00B2)', fontsize = 10)
             else:
-                plt.xlabel(f'{desired}', fontsize=10)
+                plt.xlabel(f'{desired}', fontsize = 10)
             plt.ylabel('Countries', fontsize = 10)
             plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.barh(country, data_val)
             fig.tight_layout()
-            canvas = FigureCanvasTkAgg(fig, master=self)
+            canvas = FigureCanvasTkAgg(fig, master = self)
             canvas.get_tk_widget().grid()
             canvas.draw()
             
         else: 
-            fig = plt.figure(figsize=(8,4))
+            fig = plt.figure(figsize = (8,4))
             plt.title(f'Box Plot of {desired} for Selected Countries')
             plt.xlabel('Selected Countries', fontsize = 10)
             if desired == "Area":
                 plt.ylabel(f'{desired} (km\u00B2)', fontsize = 10)
             else:
-                plt.ylabel(f'{desired}', fontsize=10)
+                plt.ylabel(f'{desired}', fontsize = 10)
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.yticks = (np.min(data_val), np.quantile(data_val, 0.25), \
                 np.median(data_val), np.quantile(data_val, 0.75), np.max(data_val))
@@ -88,7 +99,7 @@ class PlotWindow(tk.Toplevel):
             plt.tight_layout()
                 
     
-            canvas = FigureCanvasTkAgg(fig, master=self)
+            canvas = FigureCanvasTkAgg(fig, master = self)
             canvas.get_tk_widget().grid()
             canvas.draw()
 
@@ -97,7 +108,7 @@ class DialogWindow(tk.Toplevel):
     '''
     Class to interact with the user and display a listbox for user to get selection of countries
     '''
-    def __init__(self, master, prompt, data, mini, maxi, npstr, multi=False):
+    def __init__(self, master, prompt, data, mini, maxi, npstr, multi = False):
         super().__init__(master)
         self.grab_set()
         self.focus_set()
@@ -107,23 +118,23 @@ class DialogWindow(tk.Toplevel):
         self.promptStr = tk.StringVar()
         self.promptStr.set(prompt)
         self.numpyStr = tk.StringVar()
-        tk.Label(self, textvariable=self.promptStr, font=('Calibri', 13), padx=10,
-                 pady=10).grid()
+        tk.Label(self, textvariable = self.promptStr, font = ('Calibri', 13), padx = 10,
+                 pady = 10).grid()
 
         frame = tk.Frame(self)
-        self._sb = tk.Scrollbar(frame, orient='vertical')
+        self._sb = tk.Scrollbar(frame, orient = 'vertical')
         if multi:
             self.numpyStr.set(npstr)
             tk.Label(self, textvariable = self.numpyStr, font = ('Calibri', 12), padx = 10, pady = 3).grid()
-            self._lb = tk.Listbox(frame, height=6, selectmode='multiple', yscrollcommand=self._sb.set)
+            self._lb = tk.Listbox(frame, height = 6, selectmode = 'multiple', yscrollcommand = self._sb.set)
         else:
-            self._lb = tk.Listbox(frame, height=6, yscrollcommand=self._sb.set)
-        self._sb.config(command=self._lb.yview)
-        self._lb.grid(row=1, column=0)
-        self._sb.grid(row=1, column=1, sticky='NS')
-        frame.grid(row=2, column=0, padx=10, pady=10)
+            self._lb = tk.Listbox(frame, height = 6, yscrollcommand = self._sb.set)
+        self._sb.config(command = self._lb.yview)
+        self._lb.grid(row = 1, column = 0)
+        self._sb.grid(row = 1, column = 1, sticky = 'NS')
+        frame.grid(row = 2, column = 0, padx = 10, pady = 10)
         self._lb.insert(tk.END, *data)
-        tk.Button(self, text='Click to select', command = lambda : self._setChoice(mini, maxi)).grid(padx=5, pady=10)
+        tk.Button(self, text = 'Click to select', command = lambda : self._setChoice(mini, maxi)).grid(padx = 5, pady = 10)
 
         self.protocol('WM_DELETE_WIDOW', self._close)
 
@@ -177,15 +188,15 @@ class MainWindow(tk.Tk):
         # places the window in the middle of the screen
         self.geometry('+500+500')
         # Main title of Application
-        tk.Label(self, text='Tour de World', font=('Calibri', 15)).grid(pady=5)
+        tk.Label(self, text = 'Tour de World', font = ('Calibri', 15)).grid(pady = 5)
 
         # Label to prompt & buttons to lock in choice
-        tk.Label(self, text='Search Countries Data By  :', font=('Calibri', 13)).grid(pady=3)
+        tk.Label(self, text = 'Search Countries Data By  :', font = ('Calibri', 13)).grid(pady = 3)
         buttonFrame = tk.Frame(self)
-        tk.Button(buttonFrame, text='Area', command = lambda: self.getContinentChoice('area')).grid(row = 2, column = 0)
-        tk.Button(buttonFrame, text='Population', command = lambda: self.getContinentChoice('pop')).grid(row= 2, column=  1)
-        tk.Button(buttonFrame, text='General Info', command = lambda: self.getContinentChoice('general')).grid(row = 2,column =2 )
-        buttonFrame.grid(pady=3)
+        tk.Button(buttonFrame, text = 'Area', command = lambda: self.getContinentChoice('area')).grid(row = 2, column = 0)
+        tk.Button(buttonFrame, text = 'Population', command = lambda: self.getContinentChoice('pop')).grid(row = 2, column =  1)
+        tk.Button(buttonFrame, text = 'General Info', command = lambda: self.getContinentChoice('general')).grid(row = 2,column =2 )
+        buttonFrame.grid(pady = 3)
 
         self.protocol('WM_DELETE_WINDOW', self.mainWinClose)
 
