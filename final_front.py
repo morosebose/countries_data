@@ -20,7 +20,7 @@ import numpy as np
 
 class DisplayWindow(tk.Toplevel):
     '''Class to display individual cards, gets called for every country selected'''
-    def __init__(self, master, name, flag, official, capital, pop, area, lang, currency, continent, url) :
+    def __init__(self, master, name, flag, official, capitals, pop, area, langs, currency, continent, url) :
         super().__init__(master)
         
         self.transient(master)
@@ -32,12 +32,12 @@ class DisplayWindow(tk.Toplevel):
         tk.Label(F, textvariable=self.promptStr, font=("Calibri", 13), padx=10, pady=10).grid(columnspan=2)
         tk.Label(F, text=flag, font=("Calibri", 14), fg="blue").grid(row=1, column=0, sticky='e')
         tk.Label(F, text=official, font=("Calibri", 14), fg="blue").grid(row=1, column=1, sticky='w')
-        tk.Label(F, text="Capital: " + str(capital), font=("Calibri", 13), fg="blue").grid(row=2, columnspan=2)
+        tk.Label(F, text="Capital(s): " + capitals, font=("Calibri", 13), fg="blue").grid(row=2, columnspan=2)
         tk.Label(F, text=f"Population: {pop: ,}", font=("Calibri", 13), fg="blue").grid(row=3, columnspan=2)
         tk.Label(F, text=f"Area: {area: ,} km\u00B2", font=("Calibri", 13), fg="blue").grid(row=4, columnspan=2)
-        tk.Label(F, text="Language: " + str(lang).title(), font=("Calibri", 13), fg="blue").grid(row=5, columnspan=2)
-        tk.Label(F, text="Currency: " + str(currency).title(), font=("Calibri", 13), fg="blue").grid(row=6, columnspan=2)
-        tk.Label(F, text="Continent: " + str(continent), font=("Calibri", 13), fg="blue").grid(row=7, columnspan=2)
+        tk.Label(F, text="Language(s): " + langs, font=("Calibri", 13), fg="blue").grid(row=5, columnspan=2)
+        tk.Label(F, text="Currency/ies: " + currency.title(), font=("Calibri", 13), fg="blue").grid(row=6, columnspan=2)
+        tk.Label(F, text="Continent: " + continent, font=("Calibri", 13), fg="blue").grid(row=7, columnspan=2)
         F.grid(pady=20, padx=10)
         tk.Button(self, text='Visit on Google Maps', fg='blue', font=('Calibiri', 10), command = lambda: webbrowser.open(url)).grid(padx=5, pady=10)
 
@@ -307,20 +307,37 @@ class MainWindow(tk.Tk):
         '''Display general info for individual countries'''
         for choice in choices:
             name = countries[choice]
-            self._curr.execute('''SELECT C.name, C.flag, C.official, CAP.name, C.pop, C.area,  L.name, CUR.name, CO.name, C.map 
+            self._curr.execute('''SELECT C.flag, C.official, C.pop, C.area, CO.name, C.map 
                                     FROM Countries C, Continents CO
-                                    INNER JOIN Count_Lang_Jn CL on C.id = CL.country
-                                    INNER JOIN Languages L on CL.language = L.id
-                                    INNER JOIN Count_Cap_Jn CC on C.id = CC.country
-                                    INNER JOIN Capitals CAP on CC.capital = CAP.id
-                                    INNER JOIN Count_Curr_Jn CR on C.id = CR.country
-                                    INNER JOIN Currencies CUR on CR.currency = CUR.id
                                     WHERE C.continent = CO.id AND C.name = ?;''', (name, ))
-            name, flag, official, capital, pop, area, lang, currency, continent, url = self._curr.fetchone()
+            flag, official, pop, area, continent, url = self._curr.fetchone()
+            caps, langs, currens = self._getMultiples(name)
 
-
-            DisplayWindow(self, name, flag, official, capital, pop, area, lang, currency, continent, url)
-
+            DisplayWindow(self, name, flag, official, caps, pop, area, langs, currens, continent, url)
+            
+            
+    def _getMultiples(self, name) :
+        cap_set = set()
+        lang_set = set()
+        currens_set = set()
+        set_list = [cap_set, lang_set, currens_set]
+        results = self._curr.execute('''SELECT CAP.name, L.name, CUR.name
+                    FROM Countries C 
+                    INNER JOIN Count_Lang_Jn CL on C.id = CL.Country
+                    INNER JOIN Languages L on CL.language = L.id
+                    INNER JOIN Count_Cap_Jn CC on C.id = CC.Country
+                    INNER JOIN Capitals CAP on CC.capital = CAP.id
+                    INNER JOIN Count_Curr_Jn CR on C.id = CR.country
+                    INNER JOIN Currencies CUR on CR.currency = CUR.id
+                    WHERE C.name = ?''', (name, ))
+        for result in results :
+            for i in range(3) :
+                set_list[i].add(result[i])
+        caps = ', '.join(cap_set)
+        langs = ', '.join(lang_set)
+        currens = ', '.join(currens_set)
+        return caps, langs, currens
+    
 
     def mainWinClose(self):
         '''
@@ -332,11 +349,6 @@ class MainWindow(tk.Tk):
             self._conn.close()
             self.destroy()
             self.quit()
-
-    
-    @property
-    def cur(self):
-        return self._curr
 
 
 if __name__ == '__main__':
