@@ -129,8 +129,14 @@ class DialogWindow(tk.Toplevel) :
 
     def _setChoice(self, mini, maxi) :
         choice = self._lb.curselection()
+
+        if mini == maxi: 
+            err = 'Please choose a continent or Worldwide'
+        else :
+            err = f'Please choose between {mini} and {maxi} countries'
+        
         if not mini <= len(choice) <= maxi :
-            tkmb.showerror('Error', f'Please choose between {mini} and {maxi} countries', parent = self)
+            tkmb.showerror('Error', err, parent = self)
             self._lb.selection_clear(0, tk.END)
             choice = self._lb.curselection()
         else :
