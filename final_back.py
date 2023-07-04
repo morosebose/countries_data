@@ -94,16 +94,22 @@ def writeTables (countries, cur) :
         
     # Walk through JSON and populate database
     for val in countries :
+        country = val['name']['common']
         
         # Prepare to handle special cases before attempting to write tables
         # Or writing will crash / tables will have wrong data
     
         # API has wrong map for Indonesia, shows Hungary?!
-        country = val['name']['common']
         if country == 'Indonesia' :
             map_url = 'https://goo.gl/maps/w7M4eCTtCuFdSnJx9'
         else : 
             map_url = val['maps']['googleMaps']
+            
+        # API has wrong area for Svalbard and Jan Mayen, shows -1
+        if country == 'Svalbard and Jan Mayen' :
+            area = 61399
+        else :
+            area = val['area']
                   
         # Kosovo has no key ['independent']
         try : 
@@ -148,7 +154,7 @@ def writeTables (countries, cur) :
                     indep, flag, continent, area, pop, map) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', \
                     (country, val['name']['official'], val['cca3'], \
-                     indep, val['flag'], cont_id, val['area'], \
+                     indep, val['flag'], cont_id, area, \
                     val['population'], map_url))
         cur.execute('SELECT id FROM Countries WHERE name = ?', (country,))
         cid = cur.fetchone()[0]
