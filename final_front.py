@@ -55,37 +55,35 @@ class DisplayWindow(tk.Toplevel) :
 
 class PlotWindow(tk.Toplevel):
     '''Class to display boxplot and bar chart of area or population'''
-    def __init__(self, master, desired, continent, data, bar = False):
+    def __init__(self, master, desired, countries, data, bar):
         super().__init__(master)
         
         t_label = 'Area' if desired == 'area' else 'Population'
+        plt_title = f'{t_label} of Selected Countries'
+        if t_label == 'Area' :
+            t_label += ' (km\u00B2)'
                 
-        country = []
-        data_val = []
-        for item in data.items() :
-            country.append(item[0]), data_val.append(item[1])
-
         if bar :
             fig = plt.figure(figsize = (10, 5))
-            plt.title(f'{t_label} of Selected Countries')
-            if t_label == 'Area' :
-                t_label += ' (km\u00B2)'
+            plt.title(plt_title)
             plt.xlabel(f'{t_label}', fontsize = 10)
             plt.ylabel('Countries', fontsize = 10)
             plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            plt.barh(country, data_val)
+            plt.barh(countries, data)
             
         else : 
             fig = plt.figure(figsize = (6,4))
-            plt.title(f'Box Plot of {t_label} for Selected Countries')
+            plt.title(f'Box Plot of {plt_title}')
             plt.xlabel('Selected Countries', fontsize = 10)
-            if t_label == 'Area' :
-                t_label += ' (km\u00B2)'
             plt.ylabel(f'{t_label}', fontsize = 10)
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            plt.yticks = (np.min(data_val), np.quantile(data_val, 0.25), \
-                np.median(data_val), np.quantile(data_val, 0.75), np.max(data_val))
-            plt.boxplot(data_val)
+            
+            # Look into why x and y ticks aren't wprking as expected
+            plt.xticks([1], ['Selected Countries'], fontsize = 10)
+            plt.yticks = (np.min(data), np.quantile(data, 0.25), \
+                np.median(data), np.quantile(data, 0.75), np.max(data))
+            
+            plt.boxplot(data)
             
         fig.tight_layout()
         canvas = FigureCanvasTkAgg(fig, master = self)
@@ -290,20 +288,18 @@ class MainWindow(tk.Tk) :
     def _launchCountries(self, desired, countries, choices) :
         '''Display chosen countries by area or population'''
         # store countries and data in list to be used for bar chart
-        barCountries = []
-        barData = []
+        plot_countries = []
+        plot_data = []
         # goes through the indices of the curselection of the countries
         for choice in choices :
-            barCountries.append(countries[choice])
+            plot_countries.append(countries[choice])
             self._curr.execute(f'''SELECT {desired} FROM Countries 
                                     WHERE name = ?''', (countries[choice],))
             data = self._curr.fetchone()[0]
 
-            barData.append(data)
-        countriesData = dict(zip(barCountries, barData))
-        # call plotWindow to create barchart and boxplot
-        PlotWindow(self, desired, choices, countriesData, bar = True)
-        PlotWindow(self, desired, choices, countriesData)
+            plot_data.append(data)
+        for bar in (True, False) : 
+            PlotWindow(self, desired, plot_countries, plot_data, bar)
 
 
     def _launchCard(self, countries, choices) :
