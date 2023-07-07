@@ -4,16 +4,6 @@ James Kang, Surajit Bose
 Final Project Front End
 '''
 
-"""
-7/7 git push 
-- changed DialogWindow scrollbar to only show up when the user is choosing the countries, 
-as it is not needed when choosing continent/worldwide
-- added minsize and maxsize to control how big we want the user to min and max window size
-- buttons and label stretch(row/columnconfigure) in accordance to the resize by mouse
-- only got to resizing for MainWindow, DialogWindow. will have to get back to doing DisplayWindow. 
-- different listbox & numpy_array label format commented out on line # 
-
-"""
 
 # import modules
 import tkinter as tk
