@@ -1,14 +1,15 @@
-# countries_data
+# Countries Database 
 
-This project uses the [REST Countries](https://restcountries.com/) API to create a database of countries. Information for each country includes:
+This project uses the [REST Countries](https://restcountries.com/) API to create a database of countries in the world.
+The database is linked to a GUI front end that allows users to choose what data they want to view. For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them. 
+
+Information for each country includes:
 - Common name, e.g., Suriname
 - Official name, e.g.,  Republic of Suriname
 - Capital
 - Population
 - Currency
 - Continent, etc. 
-
-The database is linked to a GUI front end that allows users to choose what data they want to view. For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them. 
 
 ## Skills
 - Web access, API call, JSON 
