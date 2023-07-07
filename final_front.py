@@ -23,21 +23,21 @@ class DisplayWindow(tk.Toplevel) :
     def __init__(self, master, name, flag, official, capitals, pop, area, langs, currency, continent, url) :
         super().__init__(master)
         
-        prompt_str = f'General Information for {name}'      
+        self.prompt_str =  tk.StringVar()
+        self.prompt_str.set(f'General Information for {name}')
         cap_label = 'Capital'
         if ', ' in capitals :
             cap_label += 's'
         lang_label = 'Language'
         if ', ' in langs :
             lang_label += 's'
+        currens_label = 'Currency'
         if ', ' in currency :
             currens_label = 'Currencies'
-        else :
-            currens_label = 'Currency'
 
         # make frame, labels, and button for country card
         F = tk.Frame(self)
-        tk.Label(F, textvariable = prompt_str, font = ('Calibri', 13), padx = 10, pady = 10).grid(columnspan = 2)
+        tk.Label(F, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10, pady = 10).grid(columnspan = 2)
         tk.Label(F, text = flag, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 0, sticky = 'e')
         tk.Label(F, text = official, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 1, sticky = 'w')
         tk.Label(F, text = f'{cap_label}: ' + capitals, font = ('Calibri', 13), fg = 'blue').grid(row = 2, columnspan = 2)
@@ -91,17 +91,24 @@ class DialogWindow(tk.Toplevel) :
         self.focus_set()
         self.transient(master)
         self._choice = (-1, )
+        
+        self.prompt_str =  tk.StringVar()
+        self.prompt_str.set(prompt)
+        
+        self.numpy_str = tk.StringVar()
+        self.numpy_str.set(npstr)
 
-        tk.Label(self, textvariable = prompt, font = ('Calibri', 13), padx = 10,
+
+        tk.Label(self, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10,
                  pady = 10).grid()
 
         frame = tk.Frame(self)
         self._sb = tk.Scrollbar(frame, orient = 'vertical')
         if multi :
-            tk.Label(self, textvariable = npstr, font = ('Calibri', 12), padx = 10, pady = 3).grid()
-            self._lb = tk.Listbox(frame, height = 6, selectmode = 'multiple', yscrollcommand = self._sb.set)
+            tk.Label(self, textvariable = self.numpy_str, font = ('Calibri', 12), padx = 10, pady = 3).grid()
+            self._lb = tk.Listbox(frame, height = 8, selectmode = 'multiple', yscrollcommand = self._sb.set)
         else :
-            self._lb = tk.Listbox(frame, height = 6, yscrollcommand = self._sb.set)
+            self._lb = tk.Listbox(frame, height = 8, yscrollcommand = self._sb.set)
         self._sb.config(command = self._lb.yview)
         self._lb.grid(row = 1, column = 0)
         self._sb.grid(row = 1, column = 1, sticky = 'NS')
