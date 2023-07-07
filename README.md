@@ -1,7 +1,6 @@
 # Countries Database 
 
-This project uses the [REST Countries](https://restcountries.com/) API to create a database of all countries around the world.
-The database is linked to a GUI front end that allows users to choose how they want to view the countries' data. The user will also be able to filter the list of all the countries by choosing the whole world or by the 6 continents. For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them. 
+This project uses the [REST Countries](https://restcountries.com/) API to create a database of all the countries around the world. The database is linked to a GUI front-end that allows users to select how they want to view the data of the countries. The users will also be able to choose if they want to view the countries by the 6 continents or "Worldwide". For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them. 
 
 Information for each country includes:
 - Common name, e.g., Suriname
