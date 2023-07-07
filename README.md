@@ -24,7 +24,7 @@ To run the program, download and install final_back.py and final_front.py into t
 - final_back.py has the API call and the code to create the database from the resulting JSON download. This file creates two additional files:
   - area_pop_data.csv a CSV of the numeric (integer) data from the database
   - countries.db a sqlite database of the countries data from the API
-- final_frontier.py has the GUI front end to navigate and display the data using TKinter and numpy
+- final_front.py has the GUI front end to navigate and display the data using TKinter and numpy
 
 ## Credits
 - Final project for for CIS 41B (Advanced Python Programming) at De Anza College, Spring 2023
