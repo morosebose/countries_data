@@ -22,10 +22,10 @@ import numpy as np
 class DisplayWindow(tk.Toplevel) :
     '''Class to display individual cards, gets called for every country selected'''
     def __init__(self, master, name, flag, official, capitals, pop, area, langs, currency, continent, url) :
-        super().__init__(master)
-        
+        super().__init__(master)       
         self.prompt_str =  tk.StringVar()
         self.prompt_str.set(f'General Information for {name}')
+        
         cap_label = 'Capital'
         if ', ' in capitals :
             cap_label += 's'
@@ -48,7 +48,7 @@ class DisplayWindow(tk.Toplevel) :
         tk.Label(F, text = f'{currens_label}: ' + currency.title(), font = ('Calibri', 13), fg = 'blue').grid(row = 6, columnspan = 2)
         tk.Label(F, text = 'Continent: ' + continent, font = ('Calibri', 13), fg = 'blue').grid(row = 7, columnspan = 2)
         F.grid(pady = 20, padx = 10)
-        tk.Button(self, text = 'Visit on Google Maps', fg = 'blue', font = ('Calibri', 11), command = lambda : webbrowser.open(url)).grid(padx = 5, pady = 10)
+        tk.Button(self, text = 'Visit on Google Maps', fg = 'blue', font = ('Calibri', 12), command = lambda : webbrowser.open(url)).grid(padx = 5, pady = 10)
 
 
 class PlotWindow(tk.Toplevel):
@@ -57,13 +57,13 @@ class PlotWindow(tk.Toplevel):
         super().__init__(master)
         
         t_label = 'Area' if desired == 'area' else 'Population'
-        plt_title = f'{t_label} of Selected Countries'
+        plot_title = f'{t_label} of Selected Countries'
         if t_label == 'Area' :
             t_label += ' (km\u00B2)'
                 
         if bar :
             fig = plt.figure(figsize = (10, 5))
-            plt.title(plt_title)
+            plt.title(plot_title)
             plt.xlabel(f'{t_label}', fontsize = 10)
             plt.ylabel('Countries', fontsize = 10)
             plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
@@ -71,7 +71,7 @@ class PlotWindow(tk.Toplevel):
             
         else : 
             fig = plt.figure(figsize = (6,4))
-            plt.title(f'Box Plot of {plt_title}')
+            plt.title(f'Box Plot of {plot_title}')
             plt.ylabel(f'{t_label}', fontsize = 10)
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
             plt.boxplot(data, labels = ['Selected Countries'])
@@ -101,46 +101,28 @@ class DialogWindow(tk.Toplevel) :
 
         self.minsize(415, 250)
         self.maxsize(550, 300)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
 
         promptFrame = tk.Frame(self)
-        tk.Label(promptFrame, textvariable=self.prompt_str, font=('Calibri', 13)).grid()
+        tk.Label(promptFrame, textvariable = self.prompt_str, font=('Calibri', 13)).grid()
         promptFrame.grid()
 
         listboxFrame = tk.Frame(self)
-        # if multi:
-        #     tk.Label(self, textvariable=self.numpy_str, font=('Calibri', 12), padx=10, pady=3).grid()
-        #     self._sb = tk.Scrollbar(listboxFrame, orient='vertical')
-        #     self._lb = tk.Listbox(listboxFrame, height=8, selectmode='multiple', yscrollcommand=self._sb.set)
-        #     self._sb.config(command=self._lb.yview)
-        #     self._sb.grid(row=1, column=1, sticky='NS')
-        #
-        # else:
-        #     self._lb = tk.Listbox(listboxFrame, height=8)
-        # self._lb.insert(tk.END, *data)
-        # self._lb.grid(row=1, column=0)
-        # tk.Button(listboxFrame, text='Click to select', command=lambda: self._setChoice(mini, maxi)).grid(row = 2, padx=5, pady=10)
-        # listboxFrame.grid(row=2, column=0, padx=10, pady=10)
-
-        # self.protocol('WM_DELETE_WINDOW', self.destroy)
-
-        """OR... a little different on the label and listbox order.."""
+        self._lb = tk.Listbox(listboxFrame, height = 8)
 
         if multi:
-            self._sb = tk.Scrollbar(listboxFrame, orient='vertical')
-            self._lb = tk.Listbox(listboxFrame, height=8, selectmode='multiple', yscrollcommand=self._sb.set)
-            self._sb.config(command=self._lb.yview)
-            self._sb.grid(row=1, column=1, sticky='NS')
-            tk.Label(listboxFrame, textvariable=self.numpy_str, font=('Calibri', 12), pady=3).grid()
+            self._sb = tk.Scrollbar(listboxFrame, orient = 'vertical', command = self._lb.yview)
+            self._lb.config(selectmode = 'multiple', yscrollcommand = self._sb.set)
+            self._sb.grid(row = 1, column = 1, sticky = 'NS')
+            tk.Label(listboxFrame, textvariable = self.numpy_str, font=('Calibri', 12), pady = 3).grid()
 
-        else:
-            self._lb = tk.Listbox(listboxFrame, height=8)
+            
         self._lb.insert(tk.END, *data)
-        self._lb.grid(row=1, column=0, sticky = 'EW')
-        self._lb.grid(row=1, column=0)
-        tk.Button(listboxFrame, text='Click to select', command=lambda: self._setChoice(mini, maxi)).grid(row = 3, padx=5, pady=10)
-        listboxFrame.grid(row=2, padx=10, pady=10)
+        self._lb.grid(row = 1, column = 0, sticky = 'EW')
+        self._lb.grid(row = 1, column = 0)
+        tk.Button(listboxFrame, text = 'Click to select', command = lambda: self._setChoice(mini, maxi)).grid(row = 3, padx = 5, pady = 10)
+        listboxFrame.grid(row = 2, padx = 10, pady = 10)
 
         self.protocol('WM_DELETE_WINDOW', self.destroy)
 
@@ -199,24 +181,22 @@ class MainWindow(tk.Tk) :
         self.geometry('350x170+500+500')
         self.minsize(280, 170)
         self.maxsize(470, 270)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
+        self.grid_rowconfigure(1, weight = 1)
 
         # Main title of Application
         titleFrame = tk.Frame(self) # using frame in case we want to add a globe to the background img
-        tk.Label(titleFrame, text='Tour de World', font=('Calibri', 20)).grid( pady = 15)
-        titleFrame.grid(row=0)
+        tk.Label(titleFrame, text = 'Tour de World', font=('Calibri', 20)).grid( pady = 15)
+        titleFrame.grid(row = 0)
 
         # Label to prompt & buttons to lock-in choice
         buttonFrame = tk.Frame(self)
-        tk.Label(buttonFrame, text='Search Countries Data By : ', font=('Calibri', 13)).grid(row=0, columnspan=3,
-                                                                                             pady=10)
-        tk.Button(buttonFrame, text='Area', command=lambda: self.getContinentChoice('area')).grid(row=1, column=0)
-        tk.Button(buttonFrame, text='Population', command=lambda: self.getContinentChoice('pop')).grid(row=1, column=1)
-        tk.Button(buttonFrame, text='General Info', command=lambda: self.getContinentChoice('general')).grid(row=1,
-                                                                                                             column=2)
-        buttonFrame.grid(pady=20)
+        tk.Label(buttonFrame, text = 'Search Countries Data By : ', font=('Calibri', 13)).grid(row = 0, columnspan = 3, pady = 10)
+        tk.Button(buttonFrame, text = 'Area', command = lambda: self.getContinentChoice('area')).grid(row = 1, column = 0)
+        tk.Button(buttonFrame, text = 'Population', command = lambda: self.getContinentChoice('pop')).grid(row = 1, column = 1)
+        tk.Button(buttonFrame, text = 'General Info', command = lambda: self.getContinentChoice('general')).grid(row = 1, column = 2)
+        buttonFrame.grid(pady = 20)
 
         self.protocol('WM_DELETE_WINDOW', self.mainWinClose)
 
@@ -325,7 +305,6 @@ class MainWindow(tk.Tk) :
             self._curr.execute(f'''SELECT {desired} FROM Countries 
                                     WHERE name = ?''', (countries[choice],))
             plot_data.append(self._curr.fetchone()[0])
-
             
         for bar in (True, False) : 
             PlotWindow(self, desired, plot_countries, plot_data, bar)
@@ -370,8 +349,7 @@ class MainWindow(tk.Tk) :
         '''
         callback function to quit the program and all memory when user clicks 'X'
         '''
-        if tkmb.askokcancel('Confirm close', \
-                        'Close all windows and quit?', parent = self) :
+        if tkmb.askokcancel('Confirm close', 'Close all windows and quit?', parent = self) :
             self._conn.close()
             self.destroy()
             self.quit()
