@@ -4,6 +4,7 @@ James Kang, Surajit Bose
 Final Project Front End
 '''
 
+
 # import modules
 import tkinter as tk
 import tkinter.messagebox as tkmb
@@ -98,25 +99,51 @@ class DialogWindow(tk.Toplevel) :
         self.numpy_str = tk.StringVar()
         self.numpy_str.set(npstr)
 
+        self.minsize(415, 250)
+        self.maxsize(550, 300)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
-        tk.Label(self, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10,
-                 pady = 10).grid()
+        promptFrame = tk.Frame(self)
+        tk.Label(promptFrame, textvariable=self.prompt_str, font=('Calibri', 13)).grid()
+        promptFrame.grid()
 
-        frame = tk.Frame(self)
-        self._sb = tk.Scrollbar(frame, orient = 'vertical')
-        if multi :
-            tk.Label(self, textvariable = self.numpy_str, font = ('Calibri', 12), padx = 10, pady = 3).grid()
-            self._lb = tk.Listbox(frame, height = 8, selectmode = 'multiple', yscrollcommand = self._sb.set)
-        else :
-            self._lb = tk.Listbox(frame, height = 8, yscrollcommand = self._sb.set)
-        self._sb.config(command = self._lb.yview)
-        self._lb.grid(row = 1, column = 0)
-        self._sb.grid(row = 1, column = 1, sticky = 'NS')
-        frame.grid(row = 2, column = 0, padx = 10, pady = 10)
+        listboxFrame = tk.Frame(self)
+        # if multi:
+        #     tk.Label(self, textvariable=self.numpy_str, font=('Calibri', 12), padx=10, pady=3).grid()
+        #     self._sb = tk.Scrollbar(listboxFrame, orient='vertical')
+        #     self._lb = tk.Listbox(listboxFrame, height=8, selectmode='multiple', yscrollcommand=self._sb.set)
+        #     self._sb.config(command=self._lb.yview)
+        #     self._sb.grid(row=1, column=1, sticky='NS')
+        #
+        # else:
+        #     self._lb = tk.Listbox(listboxFrame, height=8)
+        # self._lb.insert(tk.END, *data)
+        # self._lb.grid(row=1, column=0)
+        # tk.Button(listboxFrame, text='Click to select', command=lambda: self._setChoice(mini, maxi)).grid(row = 2, padx=5, pady=10)
+        # listboxFrame.grid(row=2, column=0, padx=10, pady=10)
+
+        # self.protocol('WM_DELETE_WINDOW', self.destroy)
+
+        """OR... a little different on the label and listbox order.."""
+
+        if multi:
+            self._sb = tk.Scrollbar(listboxFrame, orient='vertical')
+            self._lb = tk.Listbox(listboxFrame, height=8, selectmode='multiple', yscrollcommand=self._sb.set)
+            self._sb.config(command=self._lb.yview)
+            self._sb.grid(row=1, column=1, sticky='NS')
+            tk.Label(listboxFrame, textvariable=self.numpy_str, font=('Calibri', 12), pady=3).grid()
+
+        else:
+            self._lb = tk.Listbox(listboxFrame, height=8)
         self._lb.insert(tk.END, *data)
-        tk.Button(self, text = 'Click to select', command = lambda : self._setChoice(mini, maxi)).grid(padx = 5, pady = 10)
+        self._lb.grid(row=1, column=0, sticky = 'EW')
+        self._lb.grid(row=1, column=0)
+        tk.Button(listboxFrame, text='Click to select', command=lambda: self._setChoice(mini, maxi)).grid(row = 3, padx=5, pady=10)
+        listboxFrame.grid(row=2, padx=10, pady=10)
 
         self.protocol('WM_DELETE_WINDOW', self.destroy)
+
 
     def _setChoice(self, mini, maxi) :
         choice = self._lb.curselection()
@@ -169,17 +196,27 @@ class MainWindow(tk.Tk) :
         self.attributes('-topmost', 'true')
         self.title('Tour de World')
         # places the window in the middle of the screen
-        self.geometry('+500+500')
-        # Main title of Application
-        tk.Label(self, text = 'Tour de World', font = ('Calibri', 15)).grid(pady = 5)
+        self.geometry('350x170+500+500')
+        self.minsize(280, 170)
+        self.maxsize(470, 270)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
-        # Label to prompt & buttons to lock in choice
-        tk.Label(self, text = 'Search Countries Data By  :', font = ('Calibri', 13)).grid(pady = 3)
+        # Main title of Application
+        titleFrame = tk.Frame(self) # using frame in case we want to add a globe to the background img
+        tk.Label(titleFrame, text='Tour de World', font=('Calibri', 20)).grid( pady = 15)
+        titleFrame.grid(row=0)
+
+        # Label to prompt & buttons to lock-in choice
         buttonFrame = tk.Frame(self)
-        tk.Button(buttonFrame, text = 'Area', command = lambda : self.getContinentChoice('area')).grid(row = 2, column = 0)
-        tk.Button(buttonFrame, text = 'Population', command = lambda : self.getContinentChoice('pop')).grid(row = 2, column =  1)
-        tk.Button(buttonFrame, text = 'General Info', command = lambda : self.getContinentChoice('general')).grid(row = 2,column = 2)
-        buttonFrame.grid(pady = 3)
+        tk.Label(buttonFrame, text='Search Countries Data By : ', font=('Calibri', 13)).grid(row=0, columnspan=3,
+                                                                                             pady=10)
+        tk.Button(buttonFrame, text='Area', command=lambda: self.getContinentChoice('area')).grid(row=1, column=0)
+        tk.Button(buttonFrame, text='Population', command=lambda: self.getContinentChoice('pop')).grid(row=1, column=1)
+        tk.Button(buttonFrame, text='General Info', command=lambda: self.getContinentChoice('general')).grid(row=1,
+                                                                                                             column=2)
+        buttonFrame.grid(pady=20)
 
         self.protocol('WM_DELETE_WINDOW', self.mainWinClose)
 
@@ -190,11 +227,10 @@ class MainWindow(tk.Tk) :
         Pass list on to method to get user's choice of countries
         '''       
         self._curr.execute('SELECT name FROM Continents ORDER BY name')
-        wholeworld = ['Worldwide']
-        continents = list(zip(wholeworld, *self._curr.fetchall()))[0]
+        continents = list(zip(['Worldwide'], *self._curr.fetchall()))[0]
         
         prompt = 'What part of the world would you like to tour?'
-        region = self._getChoice(prompt, continents)[0] 
+        region = self._getChoice(prompt, continents)[0]
 
         if region == -1 :   # User closed window without choosing
             return        
@@ -206,7 +242,7 @@ class MainWindow(tk.Tk) :
             self._curr.execute(cmd, (locale,))
         else :
             locale = ''
-            locale_str = wholeworld[0]
+            locale_str = 'Worldwide'
             self._curr.execute(cmd)
             
         data = list(zip(*self._curr.fetchall()))[0]
