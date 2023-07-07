@@ -23,24 +23,21 @@ class DisplayWindow(tk.Toplevel) :
     def __init__(self, master, name, flag, official, capitals, pop, area, langs, currency, continent, url) :
         super().__init__(master)
         
-        self.transient(master)
-        self.promptStr = tk.StringVar()
-        self.promptStr.set(f'General Information for {name}')
-        
+        self.prompt_str =  tk.StringVar()
+        self.prompt_str.set(f'General Information for {name}')
         cap_label = 'Capital'
         if ', ' in capitals :
             cap_label += 's'
         lang_label = 'Language'
         if ', ' in langs :
             lang_label += 's'
+        currens_label = 'Currency'
         if ', ' in currency :
             currens_label = 'Currencies'
-        else :
-            currens_label = 'Currency'
 
         # make frame, labels, and button for country card
         F = tk.Frame(self)
-        tk.Label(F, textvariable = self.promptStr, font = ('Calibri', 13), padx = 10, pady = 10).grid(columnspan = 2)
+        tk.Label(F, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10, pady = 10).grid(columnspan = 2)
         tk.Label(F, text = flag, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 0, sticky = 'e')
         tk.Label(F, text = official, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 1, sticky = 'w')
         tk.Label(F, text = f'{cap_label}: ' + capitals, font = ('Calibri', 13), fg = 'blue').grid(row = 2, columnspan = 2)
@@ -74,16 +71,9 @@ class PlotWindow(tk.Toplevel):
         else : 
             fig = plt.figure(figsize = (6,4))
             plt.title(f'Box Plot of {plt_title}')
-            plt.xlabel('Selected Countries', fontsize = 10)
             plt.ylabel(f'{t_label}', fontsize = 10)
             plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            
-            # Look into why x and y ticks aren't wprking as expected
-            plt.xticks([1], ['Selected Countries'], fontsize = 10)
-            plt.yticks = (np.min(data), np.quantile(data, 0.25), \
-                np.median(data), np.quantile(data, 0.75), np.max(data))
-            
-            plt.boxplot(data)
+            plt.boxplot(data, labels = ['Selected Countries'])
             
         fig.tight_layout()
         canvas = FigureCanvasTkAgg(fig, master = self)
@@ -101,21 +91,24 @@ class DialogWindow(tk.Toplevel) :
         self.focus_set()
         self.transient(master)
         self._choice = (-1, )
+        
+        self.prompt_str =  tk.StringVar()
+        self.prompt_str.set(prompt)
+        
+        self.numpy_str = tk.StringVar()
+        self.numpy_str.set(npstr)
 
-        self.promptStr = tk.StringVar()
-        self.promptStr.set(prompt)
-        self.numpyStr = tk.StringVar()
-        tk.Label(self, textvariable = self.promptStr, font = ('Calibri', 13), padx = 10,
+
+        tk.Label(self, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10,
                  pady = 10).grid()
 
         frame = tk.Frame(self)
         self._sb = tk.Scrollbar(frame, orient = 'vertical')
         if multi :
-            self.numpyStr.set(npstr)
-            tk.Label(self, textvariable = self.numpyStr, font = ('Calibri', 12), padx = 10, pady = 3).grid()
-            self._lb = tk.Listbox(frame, height = 6, selectmode = 'multiple', yscrollcommand = self._sb.set)
+            tk.Label(self, textvariable = self.numpy_str, font = ('Calibri', 12), padx = 10, pady = 3).grid()
+            self._lb = tk.Listbox(frame, height = 8, selectmode = 'multiple', yscrollcommand = self._sb.set)
         else :
-            self._lb = tk.Listbox(frame, height = 6, yscrollcommand = self._sb.set)
+            self._lb = tk.Listbox(frame, height = 8, yscrollcommand = self._sb.set)
         self._sb.config(command = self._lb.yview)
         self._lb.grid(row = 1, column = 0)
         self._sb.grid(row = 1, column = 1, sticky = 'NS')
@@ -173,7 +166,7 @@ class MainWindow(tk.Tk) :
         self._conn = sqlite3.connect(MainWindow.COUNTRIES_DB)
         self._curr = self._conn.cursor()
 
-        self.display_windows = []
+        self.attributes('-topmost', 'true')
         self.title('Tour de World')
         # places the window in the middle of the screen
         self.geometry('+500+500')
@@ -238,10 +231,10 @@ class MainWindow(tk.Tk) :
                 WHERE name = ?''', (country,)).fetchone()[0] for country in data]
         cont_array = np.array(cont_data)
         prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted by {desired_str})'
-        labelVar = f'Total Countries : {len(cont_array)}    Total {desired_str} : {np.sum(cont_array) : ,} '
+        label_var = f'Total Countries : {len(cont_array)}    Total {desired_str} : {np.sum(cont_array) : ,} '
         if desired == 'area' :
-            labelVar += ' km\u00B2'
-        choices = self._getChoice(prompt, data, labelVar, mini, maxi, multi = True)
+            label_var += ' km\u00B2'
+        choices = self._getChoice(prompt, data, label_var, mini, maxi, multi = True)
         if choices[0] == -1 :  # user closed without choosing
             return
         self._launchCountries(desired, data, choices)
@@ -250,8 +243,8 @@ class MainWindow(tk.Tk) :
     def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
         '''Get list of countries with general info'''
         prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
-        labelVar = ''
-        choices = self._getChoice(prompt, data, labelVar, mini, maxi, multi = True)
+        label_var = ''
+        choices = self._getChoice(prompt, data, label_var, mini, maxi, multi = True)
         if choices[0] == -1 : # user closed without choosing
             return
         self._launchCard(data, choices)
@@ -277,9 +270,9 @@ class MainWindow(tk.Tk) :
                 WHERE Continents.name = ? ORDER BY Countries.{desired} DESC'''
 
 
-    def _getChoice(self, prompt, continents, labelVar = '', mini = 1, maxi = 1, multi = False) :
+    def _getChoice(self, prompt, continents, label_var = '', mini = 1, maxi = 1, multi = False) :
         '''Get user's choice of which continent or countries to see'''
-        dwin = DialogWindow(self, prompt, continents, mini, maxi, labelVar, multi)
+        dwin = DialogWindow(self, prompt, continents, mini, maxi, label_var, multi)
         self.wait_window(dwin)
         choice = dwin.chosen
         return choice
@@ -295,9 +288,9 @@ class MainWindow(tk.Tk) :
             plot_countries.append(countries[choice])
             self._curr.execute(f'''SELECT {desired} FROM Countries 
                                     WHERE name = ?''', (countries[choice],))
-            data = self._curr.fetchone()[0]
+            plot_data.append(self._curr.fetchone()[0])
 
-            plot_data.append(data)
+            
         for bar in (True, False) : 
             PlotWindow(self, desired, plot_countries, plot_data, bar)
 
