@@ -1,11 +1,12 @@
 # Countries Database 
 
-This project uses the [REST Countries](https://restcountries.com/) API to create a database of all the countries around the world. The database is linked to a GUI front-end that allows users to select how they want to view the data of the countries. The users will also be able to choose if they want to view the countries by the 6 continents or "Worldwide". For example, the user can choose to display the top five countries by population or by area. Or the user can choose specific countries to view general information about them... 
+This project uses the [REST Countries](https://restcountries.com/) API to create a database of all the countries around the world. The database is linked to a GUI front-end that allows users to select how they want to view the data of the countries. The users can also choose if they want to view the countries worldwide or by any of the 7 continents. For example, the user can choose to compare the top five countries by population in Europe, or seven countries in South America by area. Or the user can choose specific countries worldwide to view general information about them. 
 
-Information for each country includes:
+General information for each country includes:
 - Common name, e.g., Suriname
 - Official name, e.g.,  Republic of Suriname
 - Capital
+- Area in square kilometers
 - Population
 - Currency
 - Continent, etc. 
@@ -13,18 +14,18 @@ Information for each country includes:
 ## Skills
 - Web access, API call, JSON 
 - Database CRUD using SQLite
-- Data analytics with numpy or pandas
 - Display data with matplotlib 
 - GUI front end with Tkinter
 
 ## Files
+The program requires that python be installed on your local machine. If you do not have python installed, you can download the latest version from [python.org](https://www.python.org/downloads/). 
 
-To run the program, download and install final_back.py and final_front.py into the same folder/directory on your local machine. First run final_back.py, then run final_front.py from the command line.
+To run this program, download and install `final_back.py` and `final_front.py` from this repository into a single folder/directory on your local machine. After doing so, use the command line to run each file in this order: first `python final_back.py`, then `python final_front.py`. 
 
-- final_back.py has the API call and the code to create the database from the resulting JSON download. This file creates two additional files:
-  - area_pop_data.csv a CSV of the numeric (integer) data from the database
-  - countries.db a sqlite database of the countries data from the API
-- final_front.py has the GUI front end to navigate and display the data using TKinter and numpy
+- `final_back.py` has the API call and the code to create the database from the resulting JSON download. This file creates two additional files:
+  - `area_pop_data.csv`, a CSV of the numeric (integer) data from the database
+  - `countries.db`, a sqlite database of the countries data from the API
+- `final_front.py` has the GUI front end to navigate and display the data using TKinter.
 
 ## Credits
 - Final project for for CIS 41B (Advanced Python Programming) at De Anza College, Spring 2023
