@@ -14,7 +14,6 @@ file, you can obtain one at https://mozilla.org/MPL/2.0/
 
 import requests
 import sqlite3
-import csv
 
 API_URL = 'https://restcountries.com/v3.1/all'
 DATABASE = 'countries.db'
