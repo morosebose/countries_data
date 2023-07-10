@@ -191,15 +191,6 @@ def writeOthers (cur, country_id, some_list, tab1, tab2, desc) :
         current_id = cur.fetchone()[0]
         cur.execute(f'''INSERT INTO {tab2} (country, {desc})
                     VALUES (?, ?)''', (country_id, current_id))
-
-
-def writeCSV (cur):
-    '''Write out CSV of data for numpy use (we ended up not using this)'''
-    with open ('area_pop_data.csv', 'w', newline = '') as datafile :
-        cur.execute ('SELECT id, continent, area, pop FROM Countries')
-        rows = cur.fetchall()
-        writer = csv.writer(datafile)
-        writer.writerows(rows)
         
 
 def main () :
@@ -210,7 +201,6 @@ def main () :
     createTables(cur) 
     writeTables(countries, cur)
     conn.commit()
-    writeCSV(cur)
     conn.close()
 
 
