@@ -1,6 +1,7 @@
 '''
 Countries Data Front End
 Authors: James Kang, Surajit Bose
+Copyright © 2023
 
 This project relies on the REST Countries API by Alejandro Matos: 
     - https://restcountries.com/
