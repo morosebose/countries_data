@@ -29,10 +29,13 @@ To run this program, download [`final_back.py`](https://github.com/morosebose/co
 
 You have to run `final_back.py` the first time. On subsequent occasions, you can simply run `final_front.py`. As long as you have not moved or deleted any of the files created by `final_back.py`, the program will run as normal. However, it is recommended that you run `final_back.py` from time to time to ensure that you have the most updated information from the API. 
 
+## License
+This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/morosebose/countries_data/blob/main/LICENSE). If a copy of the MPL was not distributed with this file, you can obtain one at [https://mozilla.org/MPL/2.0/](https://mozilla.org/MPL/2.0/).
+
 ## Credits
 - Final project for for CIS 41B (Advanced Python Programming) at De Anza College, Spring 2023
 - Professor: Clare Nguyen
 - Authors, © 2023: 
   - [James Kang](https://github.com/jcmkang), front end (TKinter, matplotlib) 
   - [Surajit A. Bose](https://github.com/morosebose), back end (JSON, SQLite, numpy/pandas)
-- REST Countries API provided by [Alejandro Matos](https://gitlab.com/amatos). 
+- [REST Countries API](https://gitlab.com/restcountries/restcountries) provided by [Alejandro Matos](https://gitlab.com/amatos). 
