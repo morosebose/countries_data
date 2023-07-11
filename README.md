@@ -55,7 +55,7 @@ To install them, open a command line prompt such as Terminal, PowerShell, or cmd
 - `python -m pip install -U requests`. This installs [requests](https://pypi.org/project/requests/), a library that allows Python programs to access web pages and API request via HTTP
 - `python -m pip install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python.
 
-### 3. Install Countries Database
+### 3. Install Tour de World
 
 Download and intall this entire repo to your local machine. 
 
