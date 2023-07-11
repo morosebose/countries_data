@@ -266,8 +266,8 @@ class MainWindow(tk.Tk) :
 
     def _handleGeneral(self, data, locale_str, desired, desired_str, mini, maxi) :
         '''Get list of countries with general info'''
-        prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
-        label_var = ''
+        prompt = f'Select between {mini} and {maxi} countries (sorted alphabetically)'
+        label_var = f'Total countries {locale_str} : {len(data)}'
         choices = self._getChoice(prompt, data, label_var, mini, maxi)
         if choices[0] == -1 : # user closed without choosing
             return
