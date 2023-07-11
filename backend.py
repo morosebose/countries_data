@@ -40,7 +40,7 @@ def createTables(cur) :
         flag TEXT NOT NULL UNIQUE,
         continent INTEGER NOT NULL,
         area INTEGER NOT NULL,
-        pop INTEGER NOT NULL,
+        population INTEGER NOT NULL,
         map TEXT NOT NULL UNIQUE)''')
     
     # Create Capitals table, one country can have many capitals (South Africa)
@@ -172,7 +172,7 @@ def writeTables (countries, cur) :
 
         # Populate Countries table
         cur.execute('''INSERT INTO Countries (name, official, code, 
-                    indep, flag, continent, area, pop, map) 
+                    indep, flag, continent, area, population, map) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', \
                     (country, val['name']['official'], val['cca3'], \
                      indep, val['flag'], cont_id, area, \
