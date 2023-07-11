@@ -17,18 +17,54 @@ General information for each country includes:
 - GUI front end with Tkinter
 
 ## Program Files
-- `final_back.py` has the API call and the code to create the database from the resulting JSON download. Running this file creates two additional files:
-  - `area_pop_data.csv`, a CSV of the numeric (integer) data from the database
-  - `countries.db`, a sqlite database of the countries data from the API
-- `final_front.py` has the GUI front end to navigate and display the data using TKinter.
+
+This repo consists of the following files: 
+
+- This README file has general information about the program
+- `backend.py` has the API call and the code to create the database from the resulting JSON download. Running this file creates `countries.db`, a sqlite database of the countries data from the API
+- `frontend.py` has the GUI front end to navigate and display the data using TKinter. This file relies on the existence of `countries.db` in the same directory
+- `CODEOWNERS` specifies the authors of the program who have permission to modify the code in this repo
+- `LICENSE` provides licensing information.
 
 ## Installing and Running the Program
-The program requires that python already be installed on your local machine. If you do not have python installed, you can download the latest version from [python.org](https://www.python.org/downloads/). 
 
-To run this program, download [`final_back.py`](https://github.com/morosebose/countries_data/blob/main/final_back.py) and [`final_front.py`](https://github.com/morosebose/countries_data/blob/main/final_front.py) from this repository into a single folder/directory on your local machine. After doing so, use the command line to run each file in this order: first `python final_back.py`, then `python final_front.py`. 
+### 1. Install Python
 
-You have to run `final_back.py` the first time. On subsequent occasions, you can simply run `final_front.py`. As long as you have not moved or deleted any of the files created by `final_back.py`, the program will run as normal. However, it is recommended that you run `final_back.py` from time to time to ensure that you have the most updated information from the API. 
+The program requires that Python and some additional packages already be installed on your local machine. If you do not have Python installed, you can download the latest version from [python.org](https://www.python.org/downloads/).
 
+### 2. Install additional libraries
+
+After installing Python, you will need to add the following libraries:
+
+- requests
+- matplotlib
+- numpy
+
+To install them, open a command line prompt such as Terminal, PowerShell, or cmd. Type the following commands at the prompt: 
+
+- `python -m pip install -U pip`. This installs the latest version of [pip](https://pypi.org/project/pip/), the Python Package Installer that allows the installation of the other required packages
+- `python -m pip install -U requests`. This installs [requests](https://pypi.org/project/requests/), a library that allows Python programs to access web pages and API request via HTTP
+- `python -m install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python
+- `python -m install -U numpy`. NumPy is the gold standard for scientific computing in Python.
+
+**Note**: If you get an error saying `commmand not found: python`, type `python3` instead. 
+
+### 3. Install Countries Database
+
+Download and intall this entire repo to your local machine. 
+
+- Click on the green Code button above this README
+  - If you don't see the button, go to the [main page for this repo](https://github.com/morosebose/countries_data) and try again
+- From the menu that opens, choose Download ZIP
+- On the local machine, uncompress the ZIP file to a location of your choice
+- At the command prompt (Terminal, PowerShell, or cmd), navigate into the folder that you just unzipped:
+  `cd <path/to/unzipped_folder>` (Mac/Linux) or `cd <path\to\unzipped_folder>` (Windows)
+- Once you are in the correct directory, run the following two commands one after another:
+  - `python backend.py` or `python3 backend.py`. This will create the `countries.db` database that the GUI front end relies on. 
+  - `python frontend.py` or `python3 frontend.py`. This will launch the GUI for you to view the countries data of your choice.
+
+You have to run `backend.py` only the first time. On subsequent runs, as long as you have not moved or deleted the `countries.db` file that gets created by the backend file, the program will run as normal. However, it is recommended that you run `backend.py` from time to time to ensure that you have the most updated data from the API. 
+    
 ## License
 This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/morosebose/countries_data/blob/main/LICENSE). If a copy of the MPL was not distributed with this file, you can obtain one at [https://mozilla.org/MPL/2.0/](https://mozilla.org/MPL/2.0/).
 
