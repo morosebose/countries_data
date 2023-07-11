@@ -30,7 +30,13 @@ This repo consists of the following files:
 
 ### 1. Install Python
 
-The program requires that Python and some additional packages already be installed on your local machine. If you do not have Python installed, you can download the latest version from [python.org](https://www.python.org/downloads/).
+The program requires that Python and some additional packages already be installed on your local machine. To check whether you have Python installed:
+
+- Open a command line prompt such as Terminal, PowerShell, or cmd
+- Type `which python` at the prompt. If you see a path such as `/usr/bin/python`, Python is installed on your machine
+- If you get an error such as `python not found`, type `which python3`
+- If you get the same error, you do not have Python installed. You can download the latest version from [python.org](https://www.python.org/downloads/).
+
 
 ### 2. Install additional libraries
 
