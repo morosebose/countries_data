@@ -354,7 +354,7 @@ class MainWindow(tk.Tk) :
         '''Display general info for individual countries'''
         for choice in choices :
             name = countries[choice]
-            self._curr.execute('''SELECT C.flag, C.official, C.pop, C.area, CO.name, C.map 
+            self._curr.execute('''SELECT C.flag, C.official, C.population, C.area, CO.name, C.map 
                                     FROM Countries C, Continents CO
                                     WHERE C.continent = CO.id AND C.name = ?''', (name, ))
             flag, official, pop, area, continent, url = self._curr.fetchone()
