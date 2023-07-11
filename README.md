@@ -33,11 +33,9 @@ This repo consists of the following files:
 The program requires that Python and some additional packages already be installed on your local machine. To check whether you have Python installed:
 
 - Open a command line prompt such as Terminal, PowerShell, or cmd
-- Type `python --version` at the prompt. If you see a response such as `Python 3.11.3`, Python is installed on your machine. Please check that the version is **Python 3.7 or higher**.
-- If the version is below Python 3.7, please upgrade to a more current version.
-  - If you need to remain on the lower version for compatibility with existing scripts, we recommend using a package manager such as [Anaconda](https://www.anaconda.com/) to allow multiple versions of Python on your computer and run the appropriate version when needed. 
-- If you get an error such as `python not found`, you do not have Python installed.
-- You can download the latest version of Python from [python.org](https://www.python.org/downloads/).
+- Type `which python` at the prompt. If you see a response such as `/usr/bin/python`, Python is installed on your machine
+- If you get an error such as `python not found`, type `which python3`
+- If you get the same error, you do not have Python installed. You can download the latest version of Python from [python.org](https://www.python.org/downloads/).
 
 ### 2. Install additional libraries
 
@@ -46,11 +44,11 @@ After installing Python, you will need to add the following libraries:
 - requests
 - matplotlib
 
-To install them, open a command line prompt such as Terminal, PowerShell, or cmd. Type the following commands at the prompt: 
+To install them, open a command line prompt such as Terminal, PowerShell, or cmd. pyType the following commands at the prompt. Depending on your installation, you many need to substitute `python3` for `python`.  
 
 - `python -m pip install -U pip`. This installs the latest version of [pip](https://pypi.org/project/pip/), the Python Package Installer that allows the installation of the other required packages
 - `python -m pip install -U requests`. This installs [requests](https://pypi.org/project/requests/), a library that allows Python programs to access web pages and API request via HTTP
-- `python -m install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python
+- `python -m pip install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python.
 
 ### 3. Install Countries Database
 
