@@ -94,7 +94,7 @@ class DialogWindow(tk.Toplevel) :
     '''
     Class to interact with the user and display a listbox for user to get selection of countries
     '''
-    def __init__(self, master, prompt, data, mini, maxi, npstr, multi = False) :
+    def __init__(self, master, prompt, data, mini, maxi, npstr) :
         super().__init__(master)
         self.grab_set()
         self.focus_set()
@@ -119,10 +119,10 @@ class DialogWindow(tk.Toplevel) :
         listboxFrame = tk.Frame(self)
         self._lb = tk.Listbox(listboxFrame, height = 8)
 
-        if multi:
+        if npstr:
             self._sb = tk.Scrollbar(listboxFrame, orient = 'vertical', command = self._lb.yview)
             self._lb.config(selectmode = 'multiple', yscrollcommand = self._sb.set)
-            self._sb.grid(row = 1, column = 1, sticky = 'NS')
+            self._sb.grid(row = 1, column = 1, sticky = 'NS')      
             tk.Label(listboxFrame, textvariable = self.numpy_str, font=('Calibri', 12), pady = 3).grid()
 
             
@@ -139,7 +139,7 @@ class DialogWindow(tk.Toplevel) :
         choice = self._lb.curselection()
 
         if mini == maxi: 
-            err = 'Please choose a continent or Worldwide'
+            err = 'Please make a selection'
         else :
             err = f'Please choose between {mini} and {maxi} countries'
         
@@ -187,7 +187,7 @@ class MainWindow(tk.Tk) :
         self.title('Tour de World')
         # places the window in the middle of the screen
         self.geometry('350x170+500+500')
-        self.minsize(280, 170)
+        self.minsize(280, 200)
         self.maxsize(470, 270)
         self.grid_columnconfigure(0, weight = 1)
         self.grid_rowconfigure(0, weight = 1)
@@ -203,7 +203,8 @@ class MainWindow(tk.Tk) :
         tk.Label(buttonFrame, text = 'Search Countries Data By : ', font=('Calibri', 13)).grid(row = 0, columnspan = 3, pady = 10)
         tk.Button(buttonFrame, text = 'Area', command = lambda: self.getContinentChoice('area')).grid(row = 1, column = 0)
         tk.Button(buttonFrame, text = 'Population', command = lambda: self.getContinentChoice('pop')).grid(row = 1, column = 1)
-        tk.Button(buttonFrame, text = 'General Info', command = lambda: self.getContinentChoice('general')).grid(row = 1, column = 2)
+        tk.Button(buttonFrame, text = 'Language', command = self._handleLanguage).grid(row = 2, column = 0)
+        tk.Button(buttonFrame, text = 'General Info', command = lambda: self.getContinentChoice('general')).grid(row = 2, column = 1)
         buttonFrame.grid(pady = 20)
 
         self.protocol('WM_DELETE_WINDOW', self.mainWinClose)
@@ -224,12 +225,11 @@ class MainWindow(tk.Tk) :
             return        
          
         cmd = self._getCommand(desired, region)   
-        if region : 
+        if region :     # User chose specific continent
             locale = continents[region]
             locale_str = f'in {locale}'
             self._curr.execute(cmd, (locale,))
         else :
-            locale = ''
             locale_str = 'Worldwide'
             self._curr.execute(cmd)
             
@@ -242,14 +242,14 @@ class MainWindow(tk.Tk) :
         if desired != 'general' :
             mini = MainWindow.MIN_COUNTRIES
             maxi = MainWindow.MAX_COUNTRIES
-            self._handleAreaOrPop(data, locale, locale_str, desired, desired_str, mini, maxi)
+            self._handleAreaOrPop(data, locale_str, desired, desired_str, mini, maxi)
         else :
             mini = 1
             maxi = MainWindow.MIN_COUNTRIES
-            self._handleGeneral(data, locale, locale_str, desired, desired_str, mini, maxi)
+            self._handleGeneral(data, locale_str, desired, desired_str, mini, maxi)
     
             
-    def _handleAreaOrPop(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
+    def _handleAreaOrPop(self, data, locale_str, desired, desired_str, mini, maxi) :
         '''Get list of countries with population or area data'''
         cont_data = [self._curr.execute(f'''SELECT {desired} from Countries 
                 WHERE name = ?''', (country,)).fetchone()[0] for country in data]
@@ -258,23 +258,58 @@ class MainWindow(tk.Tk) :
         label_var = f'Total Countries : {len(cont_array)}    Total {desired_str} : {np.sum(cont_array) : ,} '
         if desired == 'area' :
             label_var += ' km\u00B2'
-        choices = self._getChoice(prompt, data, label_var, mini, maxi, multi = True)
+        choices = self._getChoice(prompt, data, label_var, mini, maxi)
         if choices[0] == -1 :  # user closed without choosing
             return
         self._launchCountries(desired, data, choices)
 
 
-    def _handleGeneral(self, data, locale, locale_str, desired, desired_str, mini, maxi) :
+    def _handleGeneral(self, data, locale_str, desired, desired_str, mini, maxi) :
         '''Get list of countries with general info'''
         prompt = f'Select between {mini} and {maxi} countries {locale_str} (sorted alphabetically)'
         label_var = ''
-        choices = self._getChoice(prompt, data, label_var, mini, maxi, multi = True)
+        choices = self._getChoice(prompt, data, label_var, mini, maxi)
         if choices[0] == -1 : # user closed without choosing
             return
         self._launchCard(data, choices)
+    
+    
+    def _handleLanguage(self):
+        '''
+        Generate sorted list of languages
+        Get user's choice of language
+        Display list of countries where that language is spoken
+        '''
+        self._curr.execute('SELECT name FROM Languages ORDER BY name')
+        langs = list(zip(*self._curr.fetchall()))[0]
+        prompt = 'Select a language (sorted alphabetically)'
+        label_var = f'Total Languages : {len(langs)}'
+        choice = self._getChoice(prompt, langs, label_var)[0]
+        if choice == -1 : # user closed without choosing
+            return
+        selected = langs[choice]
+        self._curr.execute('''SELECT C.name FROM Countries C
+                    INNER JOIN Count_Lang_Jn CL on C.id = CL.Country
+                    INNER JOIN Languages L on CL.language = L.id
+                    WHERE L.name = ?''', (selected,))
+        countries_list = list(zip(*self._curr.fetchall()))[0]
+        num = len(countries_list)
+        
+        if num == 1:
+            suffix = 'y'
+        else :
+            suffix = 'ies'
+            
+        if selected == 'None' :
+            selected = 'No language'
+            
+        display_str = f'{selected} is spoken in {num} countr{suffix}: \n'
+        for country in countries_list :
+            display_str += f'    • {country}\n'
+        tkmb.showinfo(choice, display_str, parent = self)
         
 
-    def _getCommand (self, desired, region) :
+    def _getCommand(self, desired, region) :
         '''Get approppriate SQL command to run on database depending on user choice'''
         if desired == 'general' :
             if not region :
@@ -294,9 +329,9 @@ class MainWindow(tk.Tk) :
                 WHERE Continents.name = ? ORDER BY Countries.{desired} DESC'''
 
 
-    def _getChoice(self, prompt, continents, label_var = '', mini = 1, maxi = 1, multi = False) :
+    def _getChoice(self, prompt, data, label_var = '', mini = 1, maxi = 1) :
         '''Get user's choice of which continent or countries to see'''
-        dwin = DialogWindow(self, prompt, continents, mini, maxi, label_var, multi)
+        dwin = DialogWindow(self, prompt, data, mini, maxi, label_var)
         self.wait_window(dwin)
         choice = dwin.chosen
         return choice

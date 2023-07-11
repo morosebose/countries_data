@@ -108,6 +108,40 @@ def writeTables (countries, cur) :
         # Prepare to handle special cases before attempting to write tables
         # Or writing will crash / tables will have wrong data
     
+        
+     
+        # Antarctica, Bouvet Island, Macau, and Heard Island and McDonald 
+        # Islands have no capitals, currency, and/or languages
+       
+        no_val = ['None']
+        
+        try :
+            caps = val['capital']
+        except KeyError :
+            caps = no_val
+            
+        try :
+            currens = [key['name'] for key in val['currencies'].values()]
+        except KeyError :
+            currens = no_val
+            
+        try :
+            langs = val['languages'].values()
+        except KeyError :
+            langs = no_val
+            
+        # Island nations have no key ['borders']
+        try :
+            borders_dict[country] = val['borders']
+        except KeyError :
+            borders_dict[country] = no_val
+            
+        # Kosovo has no key ['independent']
+        try : 
+            indep = 1 if val['independent'] else 0
+        except KeyError :
+            indep = 1      # Most UN Nations recognize Kosovo's independence
+        
         # API has wrong map for Indonesia, shows Hungary?!
         if country == 'Indonesia' :
             map_url = 'https://goo.gl/maps/w7M4eCTtCuFdSnJx9'
@@ -119,38 +153,16 @@ def writeTables (countries, cur) :
             area = 61399
         else :
             area = val['area']
-                  
-        # Kosovo has no key ['independent']
-        try : 
-            indep = 1 if val['independent'] else 0
-        except KeyError :
-            indep = 1      # Most UN Nations recognize Kosovo's independence
-     
-        # Antarctica, Bouvet Island, Macau, and Heard Island and McDonald 
-        # Islands have no capitals, languages, and/or currency
-        no_val = ['None']
-        
-        try :
-            caps = val['capital']
-        except KeyError :
-            caps = no_val
             
-        try :
-            langs = val['languages'].values()
-        except KeyError :
-            langs = no_val
-            
-        try :
-            currens = [key['name'] for key in val['currencies'].values()]
-        except KeyError :
-            currens = no_val
-            
-        # Island nations have no key ['borders']
-        try :
-            borders_dict[country] = val['borders']
-        except KeyError :
-            borders_dict[country] = no_val
-        
+         # Language list for India is wonky, shows only three languages
+         # Should be either just 2 official or include all scheduled languages
+        if country == 'India' :
+            langs = ['Hindi', 'English', 'Assamese', 'Bengali', 'Bodo', \
+                'Dogri', 'Gujarati', 'Kannada', 'Kashmiri', 'Konkani', \
+                'Maithili', 'Malayalam', 'Manipuri', 'Marathi', 'Nepali', \
+                'Odia', 'Punjabi', 'Sanskrit', 'Santali', 'Sindhi', \
+                'Tamil', 'Telugu', 'Urdu']
+                          
         # Populate Continents table
         cur.execute('INSERT INTO Continents (name) VALUES (?)', \
                     (val['continents'][0],))
