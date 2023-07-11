@@ -1,19 +1,23 @@
-# Countries Database 
+# Tour de World
+
 This project uses the [REST Countries](https://restcountries.com/) API to create a database of all the countries around the world. The database is linked to a GUI front-end that allows users to select how they want to view the data of the countries. The users can also choose if they want to view the countries worldwide or by any of the 7 continents. For example, the user can choose to compare the top five countries by population in Europe, or any nine countries in worldwide by area. Or the user can choose four specific countries in south America to view general information about them. 
 
 General information for each country includes:
+
 - Common name, e.g., Suriname
 - Official name, e.g.,  Republic of Suriname
 - Capital
 - Area in square kilometers
 - Population
 - Currency
-- Continent, etc. 
+- Official languages
+- Continent 
 
-## Skills
+## Code Features
+
 - Web access, API call, JSON 
 - Database CRUD using SQLite
-- Display data with matplotlib 
+- Data display with matplotlib 
 - GUI front end with Tkinter
 
 ## Program Files
@@ -21,6 +25,7 @@ General information for each country includes:
 This repo consists of the following files: 
 
 - This README file has general information about the program
+- `tour_de_world.py` is the main file to run the program
 - `backend.py` has the API call and the code to create the database from the resulting JSON download. Running this file creates `countries.db`, a sqlite database of the countries data from the API
 - `frontend.py` has the GUI front end to navigate and display the data using TKinter. This file relies on the existence of `countries.db` in the same directory
 - `CODEOWNERS` specifies the authors of the program who have permission to modify the code in this repo
@@ -60,12 +65,8 @@ Download and intall this entire repo to your local machine.
 - On the local machine, uncompress the ZIP file to a location of your choice
 - At the command prompt (Terminal, PowerShell, or cmd), navigate into the folder that you just unzipped:
   `cd <path/to/unzipped_folder>` (Mac/Linux) or `cd <path\to\unzipped_folder>` (Windows)
-- Once you are in the correct directory, run the following two commands one after another:
-  - `python backend.py` or `python3 backend.py`. This will create the `countries.db` database that the GUI front end relies on. 
-  - `python frontend.py` or `python3 frontend.py`. This will launch the GUI for you to view the countries data of your choice.
+- Once you are in the correct directory, run `python tour_de_world.py` or `python3 tour_de_world.py` as appropriate for your system.
 
-You have to run `backend.py` only the first time. On subsequent runs, as long as you have not moved or deleted the `countries.db` file that gets created by the backend file, the program will run as normal. However, it is recommended that you run `backend.py` from time to time to ensure that you have the most updated data from the API. 
-    
 ## License
 This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/morosebose/countries_data/blob/main/LICENSE). If a copy of the MPL was not distributed with this file, you can obtain one at [https://mozilla.org/MPL/2.0/](https://mozilla.org/MPL/2.0/).
 

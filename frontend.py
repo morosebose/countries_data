@@ -275,12 +275,12 @@ class MainWindow(tk.Tk) :
         '''
         Generate sorted list of languages
         Get user's choice of language
-        Display list of countries where that language is spoken
+        Display list of countries where that language is official
         '''
         self._curr.execute('SELECT name FROM Languages ORDER BY name')
         langs = list(zip(*self._curr.fetchall()))[0]
         prompt = 'Select a language (sorted alphabetically)'
-        label_var = f'Total Languages : {len(langs)}'
+        label_var = f'Number of Official Languages : {len(langs)}'
         choice = self._getChoice('language', prompt, langs, label_var)[0]
         if choice == -1 : # user closed without choosing
             return
@@ -300,7 +300,7 @@ class MainWindow(tk.Tk) :
         if selected == 'None' :
             selected = 'No language'
             
-        display_str = f'{selected} is spoken in {num} countr{suffix}: \n'
+        display_str = f'{selected} is an official language in {num} countr{suffix}: \n'
         for country in countries_list :
             display_str += f'    • {country}\n'
         tkmb.showinfo(choice, display_str, parent = self)
