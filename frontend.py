@@ -1,5 +1,5 @@
 '''
-Countries Data Front End
+Tour de World Front End
 Authors: James Kang, Surajit Bose
 Copyright © 2023
 
@@ -307,7 +307,7 @@ class MainWindow(tk.Tk) :
         self._curr.execute('''SELECT C.name FROM Countries C
                     INNER JOIN Count_Lang_Jn CL on C.id = CL.Country
                     INNER JOIN Languages L on CL.language = L.id
-                    WHERE L.name = ?''', (selected,))
+                    WHERE L.name = ? ORDER BY C.name''', (selected,))
         countries_list = list(zip(*self._curr.fetchall()))[0]
         num = len(countries_list)
         
@@ -320,8 +320,12 @@ class MainWindow(tk.Tk) :
             selected = 'No language'
             
         display_str = f'{selected} is an official language in {num} countr{suffix}: \n'
+        i = 0
         for country in countries_list :
-            display_str += f'    • {country}\n'
+            display_str += f'• {country}    '
+            i += 1
+            if i % 2 == 0:
+                display_str += '\n'
         tkmb.showinfo(choice, display_str, parent = self)
         
 
