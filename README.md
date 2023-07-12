@@ -49,7 +49,7 @@ After installing Python, you will need to add the following libraries:
 - requests
 - matplotlib
 
-To install them, open a command line prompt such as Terminal, PowerShell, or cmd. pyType the following commands at the prompt. Depending on your installation, you many need to substitute `python3` for `python`.  
+To install them, open a command line prompt such as Terminal, PowerShell, or cmd. Type the following commands at the prompt. Depending on your installation, you many need to substitute `python3` for `python`.  
 
 - `python -m pip install -U pip`. This installs the latest version of [pip](https://pypi.org/project/pip/), the Python Package Installer that allows the installation of the other required packages
 - `python -m pip install -U requests`. This installs [requests](https://pypi.org/project/requests/), a library that allows Python programs to access web pages and API request via HTTP
