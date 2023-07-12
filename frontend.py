@@ -400,9 +400,9 @@ class MainWindow(tk.Tk) :
                     WHERE C.name = ?''', (name, )) :
             for i in range(len(set_list)) :
                 set_list[i].add(result[i])
-        caps = ', '.join(cap_set)
-        langs = ', '.join(lang_set)
-        currens = ', '.join(currens_set)
+        caps = ', '.join(sorted(cap_set))
+        langs = ', '.join(sorted(lang_set))
+        currens = ', '.join(sorted(currens_set))
         return caps, langs, currens
     
 
