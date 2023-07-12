@@ -15,6 +15,7 @@ file, you can obtain one at https://mozilla.org/MPL/2.0/
 
 # import modules
 import tkinter as tk
+from tkinter import ttk
 import tkinter.messagebox as tkmb
 import sqlite3
 import webbrowser
@@ -27,37 +28,52 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class DisplayWindow(tk.Toplevel) :
+class CountryCardWindow(tk.Toplevel) :
     '''Class to display individual cards, gets called for every country selected'''
-    def __init__(self, master, name, flag, official, capitals, pop, area, langs, currency, continent, url) :
-        super().__init__(master)       
-        self.prompt_str =  tk.StringVar()
-        self.prompt_str.set(f'General Information for {name}')
-        
-        cap_label = 'Capital'
-        if ', ' in capitals :
-            cap_label += 's'
-        lang_label = 'Language'
-        if ', ' in langs :
-            lang_label += 's'
-        currens_label = 'Currency'
-        if ', ' in currency :
-            currens_label = 'Currencies'
+    def __init__(self, master, selected_countries) :
+        super().__init__(master)
+        self.title('Country Cards')
+        self.resizable(False, False)
 
-        # make frame, labels, and button for country card
-        F = tk.Frame(self)
-        tk.Label(F, textvariable = self.prompt_str, font = ('Calibri', 13), padx = 10, pady = 10).grid(columnspan = 2)
-        tk.Label(F, text = flag, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 0, sticky = 'e')
-        tk.Label(F, text = official, font = ('Calibri', 14), fg = 'blue').grid(row = 1, column = 1, sticky = 'w')
-        tk.Label(F, text = f'{cap_label}: ' + capitals, font = ('Calibri', 13), fg = 'blue').grid(row = 2, columnspan = 2)
-        tk.Label(F, text = f'Population: {pop : ,}', font = ('Calibri', 13), fg = 'blue').grid(row = 3, columnspan = 2)
-        tk.Label(F, text = f'Area: {area : ,} km\u00B2', font = ('Calibri', 13), fg = 'blue').grid(row = 4, columnspan = 2)
-        tk.Label(F, text = f'{lang_label}: ' + langs, font = ('Calibri', 13), fg = 'blue').grid(row = 5, columnspan = 2)
-        tk.Label(F, text = f'{currens_label}: ' + currency.title(), font = ('Calibri', 13), fg = 'blue').grid(row = 6, columnspan = 2)
-        tk.Label(F, text = 'Continent: ' + continent, font = ('Calibri', 13), fg = 'blue').grid(row = 7, columnspan = 2)
-        F.grid(pady = 20, padx = 10)
-        tk.Button(self, text = 'Visit on Google Maps', fg = 'blue', font = ('Calibri', 12), command = lambda : webbrowser.open(url)).grid(padx = 5, pady = 10)
+        # create notebook
+        self.card_notebook = ttk.Notebook(self)
 
+        for country in selected_countries:
+            name, flag, official, capitals, pop, area, langs, currency, continent, url = country
+            prompt_str = tk.StringVar()
+            prompt_str.set(f'General Information for {name}')
+            cap_label = 'Capital'
+            if ', ' in capitals :
+                cap_label += 's'
+            lang_label = 'Language'
+            if ', ' in langs :
+                lang_label += 's'
+            currens_label = 'Currency'
+            if ', ' in currency :
+                currens_label = 'Currencies'
+
+            # create tab Frame to put into the window
+            my_frame1 = tk.Frame(self.card_notebook)
+            tk.Label(my_frame1, textvariable=prompt_str, font=('Calibri', 13)).grid()
+            tk.Label(my_frame1, text=flag, font=('Calibri', 50), fg='blue', pady=20).grid()
+            tk.Label(my_frame1, text=official, font=('Calibri', 14), fg='blue').grid()
+            tk.Label(my_frame1, text=f'{cap_label}: ' + capitals, font=('Calibri', 13), fg='blue').grid()
+            tk.Label(my_frame1, text=f'Population: {pop : ,}', font=('Calibri', 13), fg='blue').grid()
+            tk.Label(my_frame1, text=f'Area: {area : ,} km\u00B2', font=('Calibri', 13), fg='blue').grid()
+            tk.Label(my_frame1, text=f'{lang_label}: ' + langs, font=('Calibri', 13), fg='blue', wraplength=250,
+                     justify="center").grid()
+            tk.Label(my_frame1, text=f'{currens_label}: ' + currency.title(), font=('Calibri', 13), fg='blue').grid()
+            tk.Label(my_frame1, text='Continent: ' + continent, font=('Calibri', 13), fg='blue').grid()
+            tk.Button(my_frame1, text='Visit on Google Maps', fg='blue', font=('Calibri', 12),
+                      command=lambda: webbrowser.open(url)).grid(pady=20)
+
+            my_frame1.grid()
+            my_frame1.grid_columnconfigure(0, weight=1)
+
+            # adds each tab frame to the Notebook
+            self.card_notebook.add(my_frame1, text=f'{name[:6]}')
+
+        self.card_notebook.pack(expand=False, fill='x')
 
 class PlotWindow(tk.Toplevel):
     '''Class to display boxplot and bar chart of area or population'''
@@ -356,6 +372,7 @@ class MainWindow(tk.Tk) :
 
     def _launchCard(self, countries, choices) :
         '''Display general info for individual countries'''
+        selected_countries = []
         for choice in choices :
             name = countries[choice]
             self._curr.execute('''SELECT C.flag, C.official, C.population, C.area, CO.name, C.map 
@@ -363,9 +380,9 @@ class MainWindow(tk.Tk) :
                                     WHERE C.continent = CO.id AND C.name = ?''', (name, ))
             flag, official, pop, area, continent, url = self._curr.fetchone()
             caps, langs, currens = self._getMultiples(name)
+            selected_countries.append((name, flag, official, caps, pop, area, langs, currens, continent, url))
 
-            DisplayWindow(self, name, flag, official, caps, pop, area, langs, currens, continent, url)
-            
+        CountryCardWindow(self, selected_countries)
             
     def _getMultiples(self, name) :
         cap_set = set()
