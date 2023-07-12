@@ -27,6 +27,40 @@ from matplotlib.ticker import StrMethodFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 
+class LanguageDisplayWindow(tk.Toplevel) :
+    '''Display the list of countries where a given language has official status'''
+    def __init__(self, master, language, countries) :
+        super().__init__(master)
+        self.title(language)
+        
+        num = len(countries)
+        if num == 1:
+            suffix = 'y'
+        else :
+            suffix = 'ies'
+  
+        display_str = f'{language} is an official language in {num} countr{suffix}: \n'
+        i = 0
+        for country in countries :
+            display_str += f'• {country}    '
+            i += 1
+            if i % 2 == 0:
+                display_str += '\n'
+        
+        tk.Label(self, text = f'Countries where {language} is an official language', \
+            font = ('Calibri', 13, 'bold'), padx = 10, pady = 10).grid(columnspan = 3)
+        frame = tk.Frame(self)
+        i = 0
+        j = 0
+        for country in countries :
+            tk.Label(frame, text = f'• {country}\t', \
+                font = ('Calibri', 12)).grid(sticky = 'W', row = i, column = j)
+            j += 1
+            if j % 2 == 0 :
+                i += 1  
+                j = 0
+        frame.grid(padx = 10, pady = 5)
+
 
 class CountryCardWindow(tk.Toplevel) :
     '''Class to display individual cards, gets called for every country selected'''
@@ -293,7 +327,8 @@ class MainWindow(tk.Tk) :
         Get user's choice of language
         Display list of countries where that language is official
         '''
-        self._curr.execute('SELECT name FROM Languages ORDER BY name')
+        self._curr.execute('''SELECT name FROM Languages 
+                    WHERE name != 'None' ORDER BY name''')
         langs = list(zip(*self._curr.fetchall()))[0]
         prompt = 'Select a language (sorted alphabetically)'
         label_var = f'Number of Official Languages : {len(langs)}'
@@ -306,24 +341,8 @@ class MainWindow(tk.Tk) :
                     INNER JOIN Languages L on CL.language = L.id
                     WHERE L.name = ? ORDER BY C.name''', (selected,))
         countries_list = list(zip(*self._curr.fetchall()))[0]
-        num = len(countries_list)
-        
-        if num == 1:
-            suffix = 'y'
-        else :
-            suffix = 'ies'
-            
-        if selected == 'None' :
-            selected = 'No language'
-            
-        display_str = f'{selected} is an official language in {num} countr{suffix}: \n'
-        i = 0
-        for country in countries_list :
-            display_str += f'• {country}    '
-            i += 1
-            if i % 2 == 0:
-                display_str += '\n'
-        tkmb.showinfo(choice, display_str, parent = self)
+        LanguageDisplayWindow(self, selected, countries_list)
+
         
 
     def _getCommand(self, desired, region) :
