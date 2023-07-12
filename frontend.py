@@ -305,9 +305,8 @@ class MainWindow(tk.Tk) :
         for country in countries_list :
             display_str += f'• {country}    '
             i += 1
-            if i == 2 :
+            if i % 2 == 0:
                 display_str += '\n'
-                i = 0
         tkmb.showinfo(choice, display_str, parent = self)
         
 
