@@ -39,7 +39,7 @@ class CountryCardWindow(tk.Toplevel) :
         self.card_notebook = ttk.Notebook(self)
 
         for country in selected_countries:
-            name, flag, official, capitals, pop, area, langs, currency, continent, url = country
+            name, flag, official, capitals, pop, area, langs, currency, continent, url, code = country
             prompt_str = tk.StringVar()
             prompt_str.set(f'General Information for {name}')
             cap_label = 'Capital'
@@ -71,7 +71,7 @@ class CountryCardWindow(tk.Toplevel) :
             my_frame1.grid_columnconfigure(0, weight=1)
 
             # adds each tab frame to the Notebook
-            self.card_notebook.add(my_frame1, text=f'{name[:6]}')
+            self.card_notebook.add(my_frame1, text=f'{code}')
 
         self.card_notebook.pack(expand=False, fill='x')
 
@@ -375,12 +375,12 @@ class MainWindow(tk.Tk) :
         selected_countries = []
         for choice in choices :
             name = countries[choice]
-            self._curr.execute('''SELECT C.flag, C.official, C.population, C.area, CO.name, C.map 
+            self._curr.execute('''SELECT C.flag, C.official, C.population, C.area, CO.name, C.map, C.code
                                     FROM Countries C, Continents CO
                                     WHERE C.continent = CO.id AND C.name = ?''', (name, ))
-            flag, official, pop, area, continent, url = self._curr.fetchone()
+            flag, official, pop, area, continent, url, code = self._curr.fetchone()
             caps, langs, currens = self._getMultiples(name)
-            selected_countries.append((name, flag, official, caps, pop, area, langs, currens, continent, url))
+            selected_countries.append((name, flag, official, caps, pop, area, langs, currens, continent, url, code))
 
         CountryCardWindow(self, selected_countries)
             
