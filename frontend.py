@@ -70,7 +70,7 @@ class CountryCardWindow(tk.Toplevel) :
             my_frame1.grid()
             my_frame1.grid_columnconfigure(0, weight=1)
 
-            # adds each tab frame to the Notebook
+            # adds each tab frame to the Noteboosk
             self.card_notebook.add(my_frame1, text=f'{code}')
 
         self.card_notebook.pack(expand=False, fill='x')
