@@ -65,8 +65,11 @@ Download and intall this entire repo to your local machine.
   - If you don't see the button, go to the [main page for this repo](https://github.com/morosebose/countries_data) and try again
 - From the menu that opens, choose Download ZIP
 - On the local machine, uncompress the ZIP file to a location of your choice
-- At the command prompt (Terminal, PowerShell, or cmd), navigate into the folder that you just unzipped:
-  `cd <path/to/unzipped_folder>` (Mac/Linux) or `cd <path\to\unzipped_folder>` (Windows)
+
+### 3. Run Tour de World
+
+- Open a commnd line prompt such as Terminal or Powershell.
+- At the command prompt, navigate into the folder that you just unzipped: `cd <path/to/unzipped_folder>` (Mac/Linux) or `cd <path\to\unzipped_folder>` (Windows)
 - Once you are in the correct directory, run `python tour_de_world.py` or `python3 tour_de_world.py` as appropriate for your system.
 
 ## License
