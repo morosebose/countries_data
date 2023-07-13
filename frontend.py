@@ -39,27 +39,21 @@ class LanguageDisplayWindow(tk.Toplevel) :
         else :
             suffix = 'ies'
   
-        display_str = f'{language} is an official language in {num} countr{suffix}: \n'
-        i = 0
-        for country in countries :
-            display_str += f'• {country}    '
-            i += 1
-            if i % 2 == 0:
-                display_str += '\n'
+        display_str = f'{language} is an official language in {num} countr{suffix}'
         
-        tk.Label(self, text = f'Countries where {language} is an official language', \
-            font = ('Calibri', 13, 'bold'), padx = 10, pady = 10).grid(columnspan = 3)
+        tk.Label(self, text = display_str, font = ('Calibri', 13, 'bold'), \
+                 padx = 10, pady = 10).grid(columnspan = 2)
         frame = tk.Frame(self)
         i = 0
         j = 0
-        for country in countries :
-            tk.Label(frame, text = f'• {country}\t', \
+        for flag, country in countries :
+            tk.Label(frame, text = f'{flag} {country}\t\t', fg = 'blue', \
                 font = ('Calibri', 12)).grid(sticky = 'W', row = i, column = j)
             j += 1
             if j % 2 == 0 :
                 i += 1  
                 j = 0
-        frame.grid(padx = 10, pady = 5)
+        frame.grid(padx = 10, pady = 10)
 
 
 class CountryCardWindow(tk.Toplevel) :
@@ -88,26 +82,26 @@ class CountryCardWindow(tk.Toplevel) :
 
             # create tab Frame to put into the window
             my_frame1 = tk.Frame(self.card_notebook)
-            tk.Label(my_frame1, textvariable=prompt_str, font=('Calibri', 13)).grid()
-            tk.Label(my_frame1, text=flag, font=('Calibri', 50), fg='blue', pady=20).grid()
-            tk.Label(my_frame1, text=official, font=('Calibri', 14), fg='blue').grid()
-            tk.Label(my_frame1, text=f'{cap_label}: ' + capitals, font=('Calibri', 13), fg='blue').grid()
-            tk.Label(my_frame1, text=f'Population: {pop : ,}', font=('Calibri', 13), fg='blue').grid()
-            tk.Label(my_frame1, text=f'Area: {area : ,} km\u00B2', font=('Calibri', 13), fg='blue').grid()
-            tk.Label(my_frame1, text=f'{lang_label}: ' + langs, font=('Calibri', 13), fg='blue', wraplength=250,
-                     justify="center").grid()
-            tk.Label(my_frame1, text=f'{currens_label}: ' + currency.title(), font=('Calibri', 13), fg='blue').grid()
-            tk.Label(my_frame1, text='Continent: ' + continent, font=('Calibri', 13), fg='blue').grid()
-            tk.Button(my_frame1, text='Visit on Google Maps', fg='blue', font=('Calibri', 12),
-                      command=lambda: webbrowser.open(url)).grid(pady=20)
+            tk.Label(my_frame1, textvariable = prompt_str, font = ('Calibri', 13)).grid()
+            tk.Label(my_frame1, text = flag, font = ('Calibri', 50), fg = 'blue', pady = 20).grid()
+            tk.Label(my_frame1, text = official, font = ('Calibri', 14), fg = 'blue').grid()
+            tk.Label(my_frame1, text = f'{cap_label}: ' + capitals, font = ('Calibri', 13), fg = 'blue').grid()
+            tk.Label(my_frame1, text = f'Population: {pop : ,}', font = ('Calibri', 13), fg = 'blue').grid()
+            tk.Label(my_frame1, text = f'Area: {area : ,} km\u00B2', font = ('Calibri', 13), fg = 'blue').grid()
+            tk.Label(my_frame1, text = f'{lang_label}: ' + langs, font = ('Calibri', 13), fg = 'blue', wraplength = 250,
+                     justify = 'center').grid()
+            tk.Label(my_frame1, text = f'{currens_label}: ' + currency.title(), font = ('Calibri', 13), fg = 'blue').grid()
+            tk.Label(my_frame1, text = 'Continent: ' + continent, font = ('Calibri', 13), fg = 'blue').grid()
+            tk.Button(my_frame1, text = 'Visit on Google Maps', fg = 'blue', font = ('Calibri', 12),
+                      command = lambda: webbrowser.open(url)).grid(pady = 20)
 
             my_frame1.grid()
-            my_frame1.grid_columnconfigure(0, weight=1)
+            my_frame1.grid_columnconfigure(0, weight = 1)
 
             # adds each tab frame to the Noteboosk
-            self.card_notebook.add(my_frame1, text=f'{code}')
+            self.card_notebook.add(my_frame1, text = f'{code}')
 
-        self.card_notebook.pack(expand=False, fill='x')
+        self.card_notebook.grid()
 
 class PlotWindow(tk.Toplevel):
     '''Class to display boxplot and bar chart of area or population'''
@@ -163,7 +157,7 @@ class DialogWindow(tk.Toplevel) :
         self.grid_rowconfigure(0, weight = 1)
 
         promptFrame = tk.Frame(self)
-        tk.Label(promptFrame, textvariable = self.prompt_str, font=('Calibri', 13)).grid()
+        tk.Label(promptFrame, textvariable = self.prompt_str, font = ('Calibri', 13)).grid()
         promptFrame.grid()
 
         listboxFrame = tk.Frame(self)
@@ -174,7 +168,7 @@ class DialogWindow(tk.Toplevel) :
             self._sb = tk.Scrollbar(listboxFrame, orient = 'vertical', command = self._lb.yview)
             self._lb.config(yscrollcommand = self._sb.set)
             self._sb.grid(row = 1, column = 1, sticky = 'NS')              
-            tk.Label(listboxFrame, textvariable = self.numpy_str, font=('Calibri', 12), pady = 3).grid()
+            tk.Label(listboxFrame, textvariable = self.numpy_str, font = ('Calibri', 12), pady = 3).grid()
             
         self._lb.insert(tk.END, *data)
         self._lb.grid(row = 1, column = 0, sticky = 'EW')
@@ -246,12 +240,12 @@ class MainWindow(tk.Tk) :
 
         # Main title of Application
         titleFrame = tk.Frame(self) # using frame in case we want to add a globe to the background img
-        tk.Label(titleFrame, text = 'Tour de World', font=('Calibri', 20)).grid( pady = 15)
+        tk.Label(titleFrame, text = 'Tour de World', font = ('Calibri', 20)).grid( pady = 15)
         titleFrame.grid(row = 0)
 
         # Label to prompt & buttons to lock-in choice
         buttonFrame = tk.Frame(self)
-        tk.Label(buttonFrame, text = 'Search Countries Data By : ', font=('Calibri', 13)).grid(row = 0, columnspan = 3, pady = 10)
+        tk.Label(buttonFrame, text = 'Search Countries Data By : ', font = ('Calibri', 13)).grid(row = 0, columnspan = 3, pady = 10)
         tk.Button(buttonFrame, text = 'Area', command = lambda: self.getContinentChoice('area')).grid(row = 1, column = 0)
         tk.Button(buttonFrame, text = 'Population', command = lambda: self.getContinentChoice('population')).grid(row = 1, column = 1)
         tk.Button(buttonFrame, text = 'Language', command = self._handleLanguage).grid(row = 2, column = 0)
@@ -336,11 +330,11 @@ class MainWindow(tk.Tk) :
         if choice == -1 : # user closed without choosing
             return
         selected = langs[choice]
-        self._curr.execute('''SELECT C.name FROM Countries C
+        self._curr.execute('''SELECT C.flag, C.name FROM Countries C
                     INNER JOIN Count_Lang_Jn CL on C.id = CL.Country
                     INNER JOIN Languages L on CL.language = L.id
                     WHERE L.name = ? ORDER BY C.name''', (selected,))
-        countries_list = list(zip(*self._curr.fetchall()))[0]
+        countries_list = list(self._curr.fetchall())
         LanguageDisplayWindow(self, selected, countries_list)
 
         
