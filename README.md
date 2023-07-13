@@ -33,29 +33,31 @@ This repo consists of the following files:
 
 ## Installing and Running the Program
 
-### 1. Install Python
+### 1. Prereqs: Install Python and Additional Packages
 
-The program requires that Python and some additional packages already be installed on your local machine. To check whether you have Python installed:
+The program requires that Python and some additional packages already be installed on your local machine. 
 
-- Open a command line prompt such as Terminal, PowerShell, or cmd
-- Type `which python` at the prompt. If you see a response such as `/usr/bin/python`, Python is installed on your machine
-- If you get an error such as `python not found`, type `which python3`
-- If you get the same error, you do not have Python installed. You can download the latest version of Python from [python.org](https://www.python.org/downloads/).
+#### 1.1 If Python is not installed on your computer
 
-### 2. Install additional libraries
+- We recommend installing python using [Anaconda](https://www.anaconda.com/download#downloads). Anaconda is a convenient package manager that will automatically install both python and the required additional packages on to your computer
+- Optional: After installing Anaconda, you might find it helpful to view [this free Anaconda tutorial](https://freelearning.anaconda.cloud/get-started-with-anaconda).
 
-After installing Python, you will need to add the following libraries:
+#### 1.2 If you are not sure whether Python is installed on your computer
 
-- requests
-- matplotlib
+- If you are not sure whether Python is installed, you should assume it is not. Some operating systems (e.g., Macintosh) come with Python preinstalled, but those versions are not easy to access or update. It is preferable to install a fresh version that is easier to use
+- Follow the instructions in Section 1.1 above to install Python and the additional packages via Anaconda.
 
-To install them, open a command line prompt such as Terminal, PowerShell, or cmd. Type the following commands at the prompt. Depending on your installation, you many need to substitute `python3` for `python`.  
+#### 1.3 If Python is already installed your computer
+
+Tour de World uses some packages that are not part of the Python standard library. If you have installed Python using Anaconda, you already have these packages. You are done with the prerequesites and can move on to Section 2.
+
+If you have installed Python without using Anaconda, such as directly from [python.org](https://www.python.org/downloads/), you will need to install the additional packages. Open a command line prompt such as Terminal or PowerShell. Type the following commands at the prompt. Depending on your installation, you many need to substitute `python3` for `python`.
 
 - `python -m pip install -U pip`. This installs the latest version of [pip](https://pypi.org/project/pip/), the Python Package Installer that allows the installation of the other required packages
 - `python -m pip install -U requests`. This installs [requests](https://pypi.org/project/requests/), a library that allows Python programs to access web pages and API request via HTTP
-- `python -m pip install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python.
+- `python -m pip install -U matplotlib`. Matplotlib enables the creation of plots, charts, and other visualizations in Python. Installing matplotlib also automatically installs numpy, the gold standard for scientific calculations in python. Tour de World requires numpy.
 
-### 3. Install Tour de World
+### 2. Install Tour de World
 
 Download and intall this entire repo to your local machine. 
 
