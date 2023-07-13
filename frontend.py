@@ -33,16 +33,19 @@ class LanguageDisplayWindow(tk.Toplevel) :
         super().__init__(master)
         self.title(language)
         
+        cols = 2
         num = len(countries)
         if num == 1:
             suffix = 'y'
         else :
             suffix = 'ies'
+            if num > 10 :
+                cols = 3
   
         display_str = f'{language} is an official language in {num} countr{suffix}'
         
         tk.Label(self, text = display_str, font = ('Calibri', 13, 'bold'), \
-                 padx = 10, pady = 10).grid(columnspan = 2)
+                 padx = 10, pady = 10).grid()
         frame = tk.Frame(self)
         i = 0
         j = 0
@@ -50,7 +53,7 @@ class LanguageDisplayWindow(tk.Toplevel) :
             tk.Label(frame, text = f'{flag} {country}\t\t', fg = 'blue', \
                 font = ('Calibri', 12)).grid(sticky = 'W', row = i, column = j)
             j += 1
-            if j % 2 == 0 :
+            if j % cols == 0 :
                 i += 1  
                 j = 0
         frame.grid(padx = 10, pady = 10)
