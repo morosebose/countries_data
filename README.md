@@ -68,7 +68,7 @@ Download and intall this entire repo to your local machine.
 
 ### 3. Run Tour de World
 
-- Open a commnd line prompt such as Terminal or Powershell.
+- Open a command line prompt such as Terminal (Mac) or Powershell (Windows).
 - At the command prompt, navigate into the folder that you just unzipped: `cd <path/to/unzipped_folder>` (Mac/Linux) or `cd <path\to\unzipped_folder>` (Windows)
 - Once you are in the correct directory, run `python tour_de_world.py` or `python3 tour_de_world.py` as appropriate for your system.
 
