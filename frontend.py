@@ -27,6 +27,7 @@ from matplotlib.ticker import StrMethodFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import ImageTk, Image
+import os
 
 class LanguageDisplayWindow(tk.Toplevel) :
     '''Display the list of countries where a given language has official status'''
@@ -51,6 +52,7 @@ class LanguageDisplayWindow(tk.Toplevel) :
         i = 0
         j = 0
         for flag, country in countries :
+            if os.name == 'nt' : flag = '•'
             tk.Label(frame, text = f'{flag} {country}\t\t', fg = 'blue', \
                 font = ('Calibri', 12)).grid(sticky = 'W', row = i, column = j)
             j += 1
