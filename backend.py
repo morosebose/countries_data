@@ -37,7 +37,8 @@ def createTables(cur) :
         official TEXT NOT NULL UNIQUE,
         code TEXT NOT NULL UNIQUE,
         indep INTEGER NOT NULL,
-        flag TEXT NOT NULL UNIQUE,
+        mflag TEXT NOT NULL UNIQUE,
+        wflag TEXT NOT NULL,
         continent INTEGER NOT NULL,
         area INTEGER NOT NULL,
         population INTEGER NOT NULL,
@@ -104,7 +105,7 @@ def writeTables (countries, cur) :
     # Walk through JSON and populate database
     for val in countries :
         country = val['name']['common']
-        
+         
         # Prepare to handle special cases before attempting to write tables
         # Or writing will crash / tables will have wrong data
     
@@ -162,6 +163,9 @@ def writeTables (countries, cur) :
                 'Maithili', 'Malayalam', 'Manipuri', 'Marathi', 'Nepali', \
                 'Odia', 'Punjabi', 'Sanskrit', 'Santali', 'Sindhi', \
                 'Tamil', 'Telugu', 'Urdu']
+                
+        # Get .png of flag for Windows display
+        wflag = requests.get(val['flags']['png']).content
                           
         # Populate Continents table
         cur.execute('INSERT INTO Continents (name) VALUES (?)', \
@@ -172,10 +176,10 @@ def writeTables (countries, cur) :
 
         # Populate Countries table
         cur.execute('''INSERT INTO Countries (name, official, code, 
-                    indep, flag, continent, area, population, map) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', \
+                    indep, mflag, wflag, continent, area, population, map) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', \
                     (country, val['name']['official'], val['cca3'], \
-                     indep, val['flag'], cont_id, area, \
+                     indep, val['flag'], wflag, cont_id, area, \
                     val['population'], map_url))
         cur.execute('SELECT id FROM Countries WHERE name = ?', (country,))
         cid = cur.fetchone()[0]
