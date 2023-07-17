@@ -164,7 +164,7 @@ class PlotWindow(tk.Toplevel):
         canvas.draw()
 
         infoFrame = tk.Frame(self, borderwidth = 1, background = 'white', highlightbackground = 'black', highlightthickness = 1)
-        tk.Label(infoFrame, text = f"Countries: {countries}", font = ('Calibri', 13), background = 'white', wraplength = 400).grid(columnspan = 2, pady = 3)
+        tk.Label(infoFrame, text = f"Countries: {', '.join(countries)}", font = ('Calibri', 13), background = 'white', wraplength = 400).grid(columnspan = 2, pady = 3)
         tk.Label(infoFrame, text = f"Total {desired}:  {f'{np.sum(np.array(data)):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
         tk.Label(infoFrame, text = f"Min:  {f'{np.min(np.array(data)):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
         tk.Label(infoFrame, text = f"Max:  {f'{max(data):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
