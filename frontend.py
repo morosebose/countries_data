@@ -119,33 +119,64 @@ class CountryCardWindow(tk.Toplevel) :
         
 class PlotWindow(tk.Toplevel):
     '''Class to display boxplot and bar chart of area or population'''
-    def __init__(self, master, desired, countries, data, bar):
+    def __init__(self, master, desired, countries, data):
         super().__init__(master)
+        self.title('Plot & Analysis')
+        self.resizable(False, False)
         
         t_label = 'Area' if desired == 'area' else 'Population'
         plot_title = f'{t_label} of Selected Countries'
         if t_label == 'Area' :
             t_label += ' (km\u00B2)'
-                
-        if bar :
-            fig = plt.figure(figsize = (10, 5))
-            plt.title(f'Bar Chart of {plot_title}')
-            plt.xlabel(f'{t_label}', fontsize = 10)
-            plt.ylabel('Countries', fontsize = 10)
-            plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            plt.barh(countries, data)
-            
-        else : 
-            fig = plt.figure(figsize = (6,4))
-            plt.title(f'Box Plot of {plot_title}')
-            plt.ylabel(f'{t_label}', fontsize = 10)
-            plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
-            plt.boxplot(data, labels = ['Selected Countries'])
-            
+
+        fig = plt.figure()
+        plt.style.use("seaborn-v0_8-whitegrid")
+
+        # bar chart
+        plt.subplot(2, 1, 1)
+        plt.subplots_adjust(hspace = 0.5)
+        plt.title(f'Box Plot of {plot_title}', fontsize = 10, weight = 'bold')
+        plt.xlabel(f'{t_label}', fontsize = 8)
+        plt.yticks(fontsize = 6.5)
+        plt.xticks(fontsize = 6.5, rotation = 25)
+        plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
+        plt.boxplot(data, labels = ['Selected \nCountries'], vert = False)
+        # sns.boxplot(x = data, orient = 'h', width = 0.3)
         fig.tight_layout()
+
+        # box plot
+        plt.subplot(2, 1, 2)
+        plt.subplots_adjust(hspace = 1.5)
+        plt.title(f'Bar Chart of {plot_title}', fontsize = 10, weight = 'bold')
+        plt.xlabel(f'{t_label}', fontsize = 8)
+        plt.ylabel('Countries', fontsize = 8)
+        plt.xticks(rotation = 25, fontsize = 7)
+        plt.yticks(fontsize = 6.5)
+        plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
+        plt.barh(countries, data, align = "center")
+        for index, value in enumerate(data):
+            # v, i -> position to place text
+            plt.text(value + .5, index, str(f'{value:,}'), fontsize = 7, color = 'blue', )
+        fig.tight_layout()
+
         canvas = FigureCanvasTkAgg(fig, master = self)
         canvas.get_tk_widget().grid()
         canvas.draw()
+
+        infoFrame = tk.Frame(self, borderwidth = 1, background = 'white', highlightbackground = 'black', highlightthickness = 1)
+        tk.Label(infoFrame, text = f"Countries: {countries}", font = ('Calibri', 13), background = 'white', wraplength = 400).grid(columnspan = 2, pady = 3)
+        tk.Label(infoFrame, text = f"Total {desired}:  {f'{np.sum(np.array(data)):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
+        tk.Label(infoFrame, text = f"Min:  {f'{np.min(np.array(data)):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
+        tk.Label(infoFrame, text = f"Max:  {f'{max(data):,}'}", font = ('Calibri', 13), background = 'white').grid(column = 0, sticky = 'w')
+        tk.Label(infoFrame, text = f"Lower Q1:  {f'{np.quantile(np.array(data), .25):,.0f}'}", font = ('Calibri', 13), background = 'white').grid(row = 1, column = 1, sticky = 'w')
+        tk.Label(infoFrame, text = f"Median:  {f'{np.median(np.array(data)):,.0f}'}", font=('Calibri', 13), background = 'white').grid(row = 2, column = 1, sticky = 'w')
+        tk.Label(infoFrame, text = f"Upper Q3:  {f'{np.quantile(np.array(data), .75):,.0f}'}", font = ('Calibri', 13), background = 'white').grid(row = 3, column = 1, sticky = 'w')
+        infoFrame.grid(padx = 5, pady = 5)
+
+        # button to close
+        tk.Button(self, text = "Close", command=lambda: self.destroy()).grid(pady = 5)
+
+
 
 
 class DialogWindow(tk.Toplevel) :
@@ -393,8 +424,7 @@ class MainWindow(tk.Tk) :
                                     WHERE name = ?''', (countries[choice],))
             plot_data.append(self._curr.fetchone()[0])
             
-        for bar in (True, False) : 
-            PlotWindow(self, desired, plot_countries, plot_data, bar)
+        PlotWindow(self, desired, plot_countries, plot_data)
 
 
     def _launchCard(self, countries, choices) :
