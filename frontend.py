@@ -180,7 +180,7 @@ class PlotWindow(tk.Toplevel):
         canvas.draw()
 
         # button to close
-        tk.Button(self, text = "Close", command = self.destroy).grid(pady = 8)
+        tk.Button(self, text = 'Close', command = self.destroy).grid(pady = 8)
 
 
 class DialogWindow(tk.Toplevel) :
