@@ -137,7 +137,6 @@ class PlotWindow(tk.Toplevel):
 
         tk.Label(self, text = f'{t_label} of Selected Countries', font = ('Calibri', 15, 'bold')).grid(pady = 8)
 
-        #info_frame = tk.Frame(self, borderwidth = 1, background = 'white', highlightbackground = 'black', highlightthickness = 1)
         info_frame = tk.Frame(self)
         tk.Label(info_frame, text = ', '.join(countries), font = ('Calibri', 13, 'bold'), wraplength = 425).grid(columnspan = 2, pady = 3)
         tk.Label(info_frame, text = f'Total: {np.sum(np.array(data)):,} {a_label}', font = ('Calibri', 13)).grid(column = 0, sticky = 'w')
@@ -181,7 +180,7 @@ class PlotWindow(tk.Toplevel):
         canvas.draw()
 
         # button to close
-        tk.Button(self, text = "Close", command=lambda: self.destroy()).grid(pady = 8)
+        tk.Button(self, text = 'Close', command = self.destroy).grid(pady = 8)
 
 
 class DialogWindow(tk.Toplevel) :
