@@ -150,7 +150,7 @@ class PlotWindow(tk.Toplevel):
         # box plot
         plt.subplot(2, 1, 1)
         plt.subplots_adjust(hspace = 0.5)
-        plt.title(f'Box Plot of {plot_title}', fontsize = 10, weight = 'bold')
+        plt.title('Box Plot', fontsize = 10, weight = 'bold')
         plt.xlabel(f'{t_label}', fontsize = 8)
         plt.yticks(fontsize = 8)
         plt.xticks(fontsize = 8)
@@ -163,7 +163,7 @@ class PlotWindow(tk.Toplevel):
         # bar chart
         plt.subplot(2, 1, 2)
         plt.subplots_adjust(hspace = 1.5)
-        plt.title(f'Bar Chart of {plot_title}', fontsize = 10, weight = 'bold')
+        plt.title('Bar Chart', fontsize = 10, weight = 'bold')
         plt.xlabel(f'{t_label}', fontsize = 8)
         plt.ylabel('Countries', fontsize = 8)
         plt.xticks(fontsize = 7.25)
