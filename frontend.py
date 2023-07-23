@@ -121,50 +121,50 @@ class PlotWindow(tk.Toplevel):
     '''Class to display boxplot and bar chart of area or population'''
     def __init__(self, master, desired, countries, data):
         super().__init__(master)
-        self.title("Plot and Analysis")
+        self.title('Plot and Analysis')
         self.resizable(False, False)
-
-        t_label = 'Area' if desired == 'area' else 'Population'
-        plot_title = f'{t_label} of Selected Countries'
+        
+        t_label = desired.title()
         if t_label == 'Area' :
-            t_label += ' (km\u00B2)'
-
-        a_label = ''
-        if desired == 'area' : a_label = 'km\u00B2'
-
+            a_label = 'km\u00B2' 
+            p_label = f'{t_label} ({a_label})'
+        else :
+            a_label = ''
+            p_label = t_label
+            
         fig = plt.figure()
         plt.style.use("seaborn-v0_8-whitegrid")
 
-        tk.Label(self, text = f'What Title Should I put?? Analysis? Selected Analysis? \n {desired.title()} ??', font = ('Calibri 15 underline'), bg = 'white').grid(pady = 8)
+        tk.Label(self, text = f'{t_label} of Selected Countries', font = ('Calibri', 15, 'bold')).grid(pady = 8)
 
-        infoFrame = tk.Frame(self, borderwidth = 1, background = 'white', highlightbackground = 'black', highlightthickness = 1)
-        tk.Label(infoFrame, text = f"{', '.join(countries)}", font = ('Calibri', 13), bg = 'white', wraplength = 400).grid(columnspan = 2, pady = 3)
-        tk.Label(infoFrame, text = f"Total:  {f'{np.sum(np.array(data)):,}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(column = 0, sticky = 'w')
-        tk.Label(infoFrame, text = f"Min:  {f'{np.min(np.array(data)):,}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(column = 0, sticky = 'w')
-        tk.Label(infoFrame, text = f"1st Quartile:  {f'{np.quantile(np.array(data), .25):,.0f}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(column = 0, sticky = 'w')
-        tk.Label(infoFrame, text = f"Median:  {f'{np.median(np.array(data)):,.0f}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(row = 1, column = 1, sticky = 'w')
-        tk.Label(infoFrame, text = f"3rd Quartile:  {f'{np.quantile(np.array(data), .75):,.0f}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(row = 2, column = 1, sticky = 'w')
-        tk.Label(infoFrame, text = f"Max:  {f'{max(data):,}'} {a_label}", font = ('Calibri', 13), bg = 'white').grid(row = 3, column = 1, sticky = 'w')
-        infoFrame.grid(padx = 5, pady = 5)
+        #info_frame = tk.Frame(self, borderwidth = 1, background = 'white', highlightbackground = 'black', highlightthickness = 1)
+        info_frame = tk.Frame(self)
+        tk.Label(info_frame, text = ', '.join(countries), font = ('Calibri', 13, 'bold'), wraplength = 425).grid(columnspan = 2, pady = 3)
+        tk.Label(info_frame, text = f'Total: {np.sum(np.array(data)):,} {a_label}', font = ('Calibri', 13)).grid(column = 0, sticky = 'w')
+        tk.Label(info_frame, text = f'Min: {np.min(np.array(data)):,} {a_label}', font = ('Calibri', 13)).grid(column = 0, sticky = 'w')
+        tk.Label(info_frame, text = f'1st Quartile: {np.quantile(np.array(data), .25):,.0f} {a_label}', font = ('Calibri', 13)).grid(column = 0, sticky = 'w')
+        tk.Label(info_frame, text = f'Median: {np.median(np.array(data)):,.0f} {a_label}', font = ('Calibri', 13)).grid(row = 1, column = 1, sticky = 'w')
+        tk.Label(info_frame, text = f'3rd Quartile: {np.quantile(np.array(data), .75):,.0f} {a_label}', font = ('Calibri', 13)).grid(row = 2, column = 1, sticky = 'w')
+        tk.Label(info_frame, text = f'Max: {max(data):,} {a_label}', font = ('Calibri', 13)).grid(row = 3, column = 1, sticky = 'w')
+        info_frame.grid(padx = 5, pady = 8)
 
         # box plot
         plt.subplot(2, 1, 1)
         plt.subplots_adjust(hspace = 0.5)
         plt.title('Box Plot', fontsize = 10, weight = 'bold')
-        plt.xlabel(f'{t_label}', fontsize = 8)
+        plt.xlabel(f'{p_label}', fontsize = 8)
         plt.yticks(fontsize = 8)
         plt.xticks(fontsize = 8)
         plt.locator_params(axis = 'x', nbins = 6)
         plt.gca().xaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
         plt.boxplot(data, labels = ['Selected \nCountries'], vert = False)
-        # sns.boxplot(x = data, orient = 'h', width = 0.3)
         fig.tight_layout()
 
         # bar chart
         plt.subplot(2, 1, 2)
         plt.subplots_adjust(hspace = 1.5)
         plt.title('Bar Chart', fontsize = 10, weight = 'bold')
-        plt.xlabel(f'{t_label}', fontsize = 8)
+        plt.xlabel(f'{p_label}', fontsize = 8)
         plt.ylabel('Countries', fontsize = 8)
         plt.xticks(fontsize = 7.25)
         plt.locator_params(axis = 'x', nbins = 6)
@@ -181,7 +181,7 @@ class PlotWindow(tk.Toplevel):
         canvas.draw()
 
         # button to close
-        tk.Button(self, text = "Close", command=lambda: self.destroy()).grid(pady = 5)
+        tk.Button(self, text = "Close", command=lambda: self.destroy()).grid(pady = 8)
 
 
 class DialogWindow(tk.Toplevel) :
@@ -201,7 +201,7 @@ class DialogWindow(tk.Toplevel) :
         self.numpy_str = tk.StringVar()
         self.numpy_str.set(npstr)
 
-        self.selected_count_str = tk.StringVar()
+        self.selected_count = tk.StringVar()
 
         self.minsize(415, 250)
         self.maxsize(550, 300)
@@ -222,24 +222,24 @@ class DialogWindow(tk.Toplevel) :
             self._sb.grid(row = 1, column = 1, sticky = 'NS')
             tk.Label(listboxFrame, textvariable = self.numpy_str, font = ('Calibri', 12), pady = 3).grid()
             if desired != 'language':
-                self.selected_count_str.set(f'Selected: {len(self._lb.curselection())}')
-                tk.Label(listboxFrame, textvariable = self.selected_count_str, font = ('Calibri', 12), pady = 3).grid()
+                self.selected_count.set('Countries Selected: 0')
+                tk.Label(listboxFrame, textvariable = self.selected_count, font = ('Calibri', 12), pady = 3).grid()
                 self._lb.bind('<<ListboxSelect>>', self._update_listbox)
+
 
         self._lb.insert(tk.END, *data)
         self._lb.grid(row = 1, column = 0, sticky = 'EW')
         self._lb.grid(row = 1, column = 0)
-        tk.Button(listboxFrame, text = 'Select', command = lambda: self._setChoice(desired, mini, maxi)).grid(padx = 5,
-                                                                                                              pady = 5)
+        tk.Button(listboxFrame, text = 'Select', command = lambda: self._setChoice(desired, mini, maxi)).grid(padx = 5, pady = 5)
         listboxFrame.grid(row = 2, padx = 10, pady = 10)
 
         self.protocol('WM_DELETE_WINDOW', self.destroy)
-
-    def _update_listbox(self, event):
-        self.selected_count_str.set(f"Countries Selected: {len(self._lb.curselection())}")
-
-
-
+        
+    
+    def _update_listbox(self, event) :
+        self.selected_count.set(f'Countries Selected: {len(self._lb.curselection())}')
+        
+        
     def _setChoice(self, desired, mini, maxi) :
         
         if desired in ['continent', 'language']: 
